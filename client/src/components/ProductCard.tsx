@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
+import { useLocation } from "wouter";
 
 interface ProductCardProps {
   id: string;
@@ -39,6 +40,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [currentImage, setCurrentImage] = useState(image);
+  const [, setLocation] = useLocation();
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -54,7 +56,7 @@ export default function ProductCard({
   return (
     <Card 
       className="overflow-hidden cursor-pointer hover-elevate active-elevate-2 group"
-      onClick={onClick}
+      onClick={() => onClick ? onClick() : setLocation(`/product/${id}`)}
       data-testid={`card-product-${id}`}
     >
       <div className="relative aspect-[3/4] overflow-hidden">

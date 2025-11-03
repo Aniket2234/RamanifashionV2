@@ -1,0 +1,338 @@
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useLocation } from "wouter";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useToast } from "@/hooks/use-toast";
+
+export default function Checkout() {
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+  
+  const [addressData, setAddressData] = useState({
+    fullName: "",
+    phone: "",
+    pincode: "",
+    address: "",
+    locality: "",
+    city: "",
+    state: "",
+    landmark: "",
+    addressType: "home" as "home" | "office",
+  });
+
+  const { data: cart } = useQuery({
+    queryKey: ["/api/cart"],
+  });
+
+  const { data: addresses } = useQuery({
+    queryKey: ["/api/addresses"],
+  });
+
+  const createAddressMutation = useMutation({
+    mutationFn: (data: any) => apiRequest("/api/addresses", "POST", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/addresses"] });
+      setShowAddressForm(false);
+      toast({ title: "Address added successfully" });
+    },
+  });
+
+  const createOrderMutation = useMutation({
+    mutationFn: (data: any) => apiRequest("/api/orders", "POST", data),
+    onSuccess: () => {
+      toast({ title: "Order placed successfully!" });
+      setLocation("/orders");
+    },
+    onError: () => {
+      toast({ title: "Please login to place order", variant: "destructive" });
+    },
+  });
+
+  const items = (cart as any)?.items || [];
+  const subtotal = items.reduce((sum: number, item: any) => {
+    return sum + (item.productId?.price || 0) * item.quantity;
+  }, 0);
+
+  const shippingCharges = subtotal >= 999 ? 0 : 99;
+  const total = subtotal + shippingCharges;
+
+  const handleAddAddress = (e: React.FormEvent) => {
+    e.preventDefault();
+    createAddressMutation.mutate(addressData);
+  };
+
+  const handlePlaceOrder = () => {
+    if (!selectedAddress) {
+      toast({ title: "Please select a delivery address", variant: "destructive" });
+      return;
+    }
+
+    const selectedAddr = (addresses as any)?.find((a: any) => a._id === selectedAddress);
+    if (!selectedAddr) return;
+
+    const orderData = {
+      items: items.map((item: any) => ({
+        productId: item.productId._id,
+        name: item.productId.name,
+        price: item.productId.price,
+        quantity: item.quantity,
+        image: item.productId.images?.[0],
+      })),
+      shippingAddress: {
+        fullName: selectedAddr.fullName,
+        phone: selectedAddr.phone,
+        address: selectedAddr.address,
+        locality: selectedAddr.locality,
+        city: selectedAddr.city,
+        state: selectedAddr.state,
+        pincode: selectedAddr.pincode,
+        landmark: selectedAddr.landmark,
+      },
+      subtotal,
+      shippingCharges,
+      total,
+      paymentMethod,
+    };
+
+    createOrderMutation.mutate(orderData);
+  };
+
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+          <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
+          <Button onClick={() => setLocation("/products")}>Continue Shopping</Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8" data-testid="text-page-title">Checkout</h1>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Delivery Address</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {(addresses as any)?.map((addr: any) => (
+                  <div
+                    key={addr._id}
+                    className={`p-4 border rounded-md cursor-pointer hover-elevate ${
+                      selectedAddress === addr._id ? 'border-primary bg-primary/5' : ''
+                    }`}
+                    onClick={() => setSelectedAddress(addr._id)}
+                    data-testid={`address-${addr._id}`}
+                  >
+                    <div className="flex items-start gap-2">
+                      <RadioGroup value={selectedAddress || ""}>
+                        <RadioGroupItem value={addr._id} />
+                      </RadioGroup>
+                      <div className="flex-1">
+                        <div className="font-semibold">{addr.fullName}</div>
+                        <div className="text-sm text-muted-foreground">{addr.phone}</div>
+                        <div className="text-sm mt-1">
+                          {addr.address}, {addr.locality}, {addr.city}, {addr.state} - {addr.pincode}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {showAddressForm ? (
+                  <form onSubmit={handleAddAddress} className="space-y-4 p-4 border rounded-md">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input
+                          id="fullName"
+                          value={addressData.fullName}
+                          onChange={(e) => setAddressData({ ...addressData, fullName: e.target.value })}
+                          required
+                          data-testid="input-full-name"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input
+                          id="phone"
+                          value={addressData.phone}
+                          onChange={(e) => setAddressData({ ...addressData, phone: e.target.value })}
+                          required
+                          data-testid="input-phone"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="address">Address</Label>
+                      <Input
+                        id="address"
+                        value={addressData.address}
+                        onChange={(e) => setAddressData({ ...addressData, address: e.target.value })}
+                        required
+                        data-testid="input-address"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="locality">Locality</Label>
+                        <Input
+                          id="locality"
+                          value={addressData.locality}
+                          onChange={(e) => setAddressData({ ...addressData, locality: e.target.value })}
+                          required
+                          data-testid="input-locality"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="pincode">Pincode</Label>
+                        <Input
+                          id="pincode"
+                          value={addressData.pincode}
+                          onChange={(e) => setAddressData({ ...addressData, pincode: e.target.value })}
+                          required
+                          data-testid="input-pincode"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="city">City</Label>
+                        <Input
+                          id="city"
+                          value={addressData.city}
+                          onChange={(e) => setAddressData({ ...addressData, city: e.target.value })}
+                          required
+                          data-testid="input-city"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="state">State</Label>
+                        <Input
+                          id="state"
+                          value={addressData.state}
+                          onChange={(e) => setAddressData({ ...addressData, state: e.target.value })}
+                          required
+                          data-testid="input-state"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button type="submit" disabled={createAddressMutation.isPending} data-testid="button-save-address">
+                        Save Address
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => setShowAddressForm(false)} data-testid="button-cancel-address">
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  <Button variant="outline" onClick={() => setShowAddressForm(true)} data-testid="button-add-address">
+                    + Add New Address
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment Method</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <div className="flex items-center space-x-2 p-3 border rounded-md hover-elevate">
+                    <RadioGroupItem value="cod" id="cod" data-testid="radio-cod" />
+                    <Label htmlFor="cod" className="flex-1 cursor-pointer">
+                      Cash on Delivery
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 border rounded-md hover-elevate">
+                    <RadioGroupItem value="online" id="online" data-testid="radio-online" />
+                    <Label htmlFor="online" className="flex-1 cursor-pointer">
+                      Online Payment (Coming Soon)
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div>
+            <Card className="sticky top-24">
+              <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  {items.map((item: any) => (
+                    <div key={item.productId?._id} className="flex justify-between text-sm">
+                      <span className="line-clamp-1">
+                        {item.productId?.name} × {item.quantity}
+                      </span>
+                      <span>₹{(item.productId?.price || 0) * item.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span data-testid="text-subtotal">₹{subtotal}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Shipping</span>
+                    <span data-testid="text-shipping">{shippingCharges === 0 ? 'FREE' : `₹${shippingCharges}`}</span>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total</span>
+                  <span className="text-primary" data-testid="text-total">₹{total}</span>
+                </div>
+
+                <Button
+                  className="w-full"
+                  onClick={handlePlaceOrder}
+                  disabled={!selectedAddress || createOrderMutation.isPending}
+                  data-testid="button-place-order"
+                >
+                  Place Order
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}

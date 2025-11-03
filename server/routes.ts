@@ -47,10 +47,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const query: any = {};
 
-      if (category) query.category = category;
-      if (fabric) query.fabric = fabric;
-      if (color) query.color = color;
-      if (occasion) query.occasion = occasion;
+      // Handle multi-select filters (comma-separated values)
+      if (category) {
+        const categories = (category as string).split(',').filter(Boolean);
+        query.category = categories.length > 1 ? { $in: categories } : categories[0];
+      }
+      if (fabric) {
+        const fabrics = (fabric as string).split(',').filter(Boolean);
+        query.fabric = fabrics.length > 1 ? { $in: fabrics } : fabrics[0];
+      }
+      if (color) {
+        const colors = (color as string).split(',').filter(Boolean);
+        query.color = colors.length > 1 ? { $in: colors } : colors[0];
+      }
+      if (occasion) {
+        const occasions = (occasion as string).split(',').filter(Boolean);
+        query.occasion = occasions.length > 1 ? { $in: occasions } : occasions[0];
+      }
+      
       if (inStock === 'true') query.inStock = true;
       if (minPrice || maxPrice) {
         query.price = {};
