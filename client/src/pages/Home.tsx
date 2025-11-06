@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import CategoryCard from "@/components/CategoryCard";
 import ProductCard from "@/components/ProductCard";
+import NewArrivalCard from "@/components/NewArrivalCard";
 import OccasionCard from "@/components/OccasionCard";
 import TrustBadges from "@/components/TrustBadges";
 import TestimonialCard from "@/components/TestimonialCard";
@@ -140,25 +141,23 @@ export default function Home() {
               View All
             </button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {newArrivals.slice(0, 6).map((product: any) => (
-              <ProductCard
-                key={product._id}
-                id={product._id}
-                name={product.name}
-                image={product.images?.[0] || "/placeholder.jpg"}
-                price={product.price}
-                originalPrice={product.originalPrice}
-                discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
-                rating={product.rating}
-                reviewCount={product.reviewCount}
-                isNew={product.isNew}
-                isBestseller={product.isBestseller}
-                onClick={() => setLocation(`/product/${product._id}`)}
-                onAddToCart={() => {}}
-                onAddToWishlist={() => {}}
-              />
-            ))}
+          <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+            <div className="flex gap-4 pb-4">
+              {newArrivals.slice(0, 6).map((product: any) => (
+                <NewArrivalCard
+                  key={product._id}
+                  id={product._id}
+                  name={product.name}
+                  image={product.images?.[0] || "/placeholder.jpg"}
+                  price={product.price}
+                  originalPrice={product.originalPrice}
+                  discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
+                  rating={product.rating}
+                  reviewCount={product.reviewCount}
+                  onClick={() => setLocation(`/product/${product._id}`)}
+                />
+              ))}
+            </div>
           </div>
         </section>
 
