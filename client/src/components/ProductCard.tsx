@@ -59,7 +59,7 @@ export default function ProductCard({
       onClick={() => onClick ? onClick() : setLocation(`/product/${id}`)}
       data-testid={`card-product-${id}`}
     >
-      <div className="relative aspect-[3/4] overflow-hidden">
+      <div className="relative aspect-[3/5] overflow-hidden">
         <img
           src={currentImage}
           alt={name}
@@ -126,17 +126,17 @@ export default function ProductCard({
           {name}
         </h3>
 
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-primary" data-testid={`text-price-${id}`}>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-lg font-bold text-black" data-testid={`text-price-${id}`}>
             ₹{price.toLocaleString()}
           </span>
           {originalPrice && (
             <>
-              <span className="text-sm text-muted-foreground line-through" data-testid={`text-original-price-${id}`}>
+              <span className="text-sm text-black line-through" data-testid={`text-original-price-${id}`}>
                 ₹{originalPrice.toLocaleString()}
               </span>
               {discount !== undefined && discount > 0 && (
-                <span className="text-xs text-green-600 font-medium" data-testid={`text-discount-${id}`}>
+                <span className="text-xs text-black font-medium" data-testid={`text-discount-${id}`}>
                   {discount}% off
                 </span>
               )}

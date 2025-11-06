@@ -34,7 +34,7 @@ export default function NewArrivalCard({
       onClick={() => onClick ? onClick() : setLocation(`/product/${id}`)}
       data-testid={`card-new-arrival-${id}`}
     >
-      <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
+      <div className="relative aspect-[3/5] overflow-hidden bg-gray-100">
         <img
           src={image}
           alt={name}
@@ -70,22 +70,23 @@ export default function NewArrivalCard({
           {name}
         </h3>
 
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-primary" data-testid={`text-price-${id}`}>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-lg font-bold text-black" data-testid={`text-price-${id}`}>
             ₹{price.toLocaleString()}
           </span>
           {originalPrice && (
-            <span className="text-sm text-muted-foreground line-through" data-testid={`text-original-price-${id}`}>
-              ₹{originalPrice.toLocaleString()}
-            </span>
+            <>
+              <span className="text-sm text-black line-through" data-testid={`text-original-price-${id}`}>
+                ₹{originalPrice.toLocaleString()}
+              </span>
+              {discount !== undefined && discount > 0 && (
+                <span className="text-xs text-black font-medium" data-testid={`text-discount-${id}`}>
+                  {discount}% off
+                </span>
+              )}
+            </>
           )}
         </div>
-        
-        {discount !== undefined && discount > 0 && (
-          <span className="text-xs text-green-600 font-medium block mt-1" data-testid={`text-discount-${id}`}>
-            {discount}% off
-          </span>
-        )}
       </div>
     </Card>
   );
