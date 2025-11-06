@@ -187,7 +187,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
         </div>
       </div>
 
-      <nav className="hidden md:block border-t bg-white">
+      <nav className="hidden md:block bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <ul className="flex items-center justify-center gap-12 py-4 text-base font-medium">
             <li><a href="/" className="hover-elevate px-4 py-2 rounded-md tracking-wide" data-testid="link-home">HOME</a></li>
