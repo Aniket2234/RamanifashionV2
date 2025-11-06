@@ -68,36 +68,36 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
               <Menu className="h-5 w-5" />
             </Button>
 
-            <div className="hidden md:flex flex-col gap-2">
+            <div className="hidden md:flex items-start gap-6">
               <a 
                 href="https://instagram.com/ramanifashion" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center gap-2 text-pink-600 hover:text-pink-700 transition-colors group"
+                className="flex flex-col items-center gap-1 text-pink-600 hover:text-pink-700 transition-colors group"
                 data-testid="link-instagram"
               >
-                <SiInstagram className="h-5 w-5 flex-shrink-0" />
-                <span className="text-sm font-medium">@ramanifashion</span>
+                <SiInstagram className="h-6 w-6" />
+                <span className="text-xs font-medium">@ramanifashion</span>
               </a>
               <a 
                 href="https://facebook.com/ramanifashion" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors group"
+                className="flex flex-col items-center gap-1 text-blue-600 hover:text-blue-700 transition-colors group"
                 data-testid="link-facebook"
               >
-                <SiFacebook className="h-5 w-5 flex-shrink-0" />
-                <span className="text-sm font-medium">@ramanifashion</span>
+                <SiFacebook className="h-6 w-6" />
+                <span className="text-xs font-medium">@ramanifashion</span>
               </a>
               <a 
                 href="https://wa.me/915555555555" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors group"
+                className="flex flex-col items-center gap-1 text-green-600 hover:text-green-700 transition-colors group"
                 data-testid="link-whatsapp"
               >
-                <SiWhatsapp className="h-5 w-5 flex-shrink-0" />
-                <span className="text-sm font-medium">+91 5555555555</span>
+                <SiWhatsapp className="h-6 w-6" />
+                <span className="text-xs font-medium">+91 5555555555</span>
               </a>
             </div>
           </div>
