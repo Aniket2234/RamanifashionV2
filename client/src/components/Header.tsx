@@ -210,10 +210,10 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 <a href="/products?isTrending=true" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-trending-collection">TRENDING COLLECTION</a>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="nav-link px-4 py-2 tracking-wide text-base font-medium bg-transparent hover:bg-transparent data-[state=open]:bg-transparent" data-testid="link-categories">
+                <NavigationMenuTrigger className="px-4 py-2 tracking-wide text-base font-medium bg-transparent hover:bg-transparent data-[state=open]:bg-transparent" data-testid="link-categories">
                   CATEGORIES
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="left-0 top-full bg-white shadow-lg border border-gray-200">
+                <NavigationMenuContent className="bg-white">
                   <div className="w-[250px] p-3">
                     <ul className="grid gap-2">
                       <li>

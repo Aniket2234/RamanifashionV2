@@ -374,7 +374,7 @@
   position: absolute;
   width: 0;
   height: 2px;
-  bottom: -4px;
+  bottom: 0;
   left: 0;
   background-color: hsl(var(--primary));
   transition: width 0.3s ease-in-out;
@@ -382,4 +382,11 @@
 
 .nav-link:hover::after {
   width: 100%;
+}
+
+/* Fix Categories trigger alignment */
+[data-testid="link-categories"] {
+  height: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
 }
