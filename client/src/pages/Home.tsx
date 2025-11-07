@@ -218,19 +218,19 @@ export default function Home() {
 
         <section className="py-12" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
           <div className="max-w-7xl mx-auto px-4">
-            <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block mb-4" data-testid="text-section-new-arrivals-home">
-                New Arrival
-              </h2>
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setLocation("/new-arrivals")}
-                  className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-                  data-testid="button-view-all-new-arrivals"
-                >
-                  View All
-                </button>
+            <div className="relative mb-6">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block" data-testid="text-section-new-arrivals-home">
+                  New Arrival
+                </h2>
               </div>
+              <button
+                onClick={() => setLocation("/new-arrivals")}
+                className="absolute right-0 top-1/2 -translate-y-1/2 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                data-testid="button-view-all-new-arrivals"
+              >
+                View All
+              </button>
             </div>
             <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
               <div className="flex gap-4 pb-4">
@@ -265,19 +265,19 @@ export default function Home() {
 
         <section className="py-12" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
           <div className="max-w-7xl mx-auto px-4">
-            <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block mb-4" data-testid="text-section-trending-collection">
-                Trending Collection
-              </h2>
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setLocation("/products?isTrending=true")}
-                  className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-                  data-testid="button-view-all-trending"
-                >
-                  View All
-                </button>
+            <div className="relative mb-6">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block" data-testid="text-section-trending-collection">
+                  Trending Collection
+                </h2>
               </div>
+              <button
+                onClick={() => setLocation("/products?isTrending=true")}
+                className="absolute right-0 top-1/2 -translate-y-1/2 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                data-testid="button-view-all-trending"
+              >
+                View All
+              </button>
             </div>
             <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
               <div className="flex gap-4 pb-4">
