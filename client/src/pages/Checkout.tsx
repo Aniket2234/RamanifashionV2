@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
@@ -18,6 +18,14 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast({ title: "Please login to proceed with checkout", variant: "destructive" });
+      setLocation("/login");
+    }
+  }, [setLocation, toast]);
   
   const [addressData, setAddressData] = useState({
     fullName: "",

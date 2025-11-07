@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import Header from "@/components/Header";
@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw } from "lucide-react";
+import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { localStorageService } from "@/lib/localStorage";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
@@ -33,7 +35,14 @@ export default function ProductDetail() {
       toast({ title: "Added to cart successfully!" });
     },
     onError: () => {
-      toast({ title: "Please login to add items to cart", variant: "destructive" });
+      const token = localStorage.getItem("token");
+      if (!token) {
+        localStorageService.addToCart(product._id, quantity);
+        queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+        toast({ title: "Added to cart successfully!" });
+      } else {
+        toast({ title: "Failed to add to cart", variant: "destructive" });
+      }
     },
   });
 
@@ -44,9 +53,37 @@ export default function ProductDetail() {
       toast({ title: "Added to wishlist!" });
     },
     onError: () => {
-      toast({ title: "Please login to add to wishlist", variant: "destructive" });
+      const token = localStorage.getItem("token");
+      if (!token) {
+        localStorageService.addToWishlist(product._id);
+        queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] });
+        toast({ title: "Added to wishlist!" });
+      } else {
+        toast({ title: "Failed to add to wishlist", variant: "destructive" });
+      }
     },
   });
+
+  const buyNowMutation = useMutation({
+    mutationFn: (data: any) => apiRequest("/api/cart", "POST", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+      setLocation("/checkout");
+    },
+    onError: () => {
+      toast({ title: "Failed to proceed with Buy Now", variant: "destructive" });
+    },
+  });
+
+  const handleBuyNow = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast({ title: "Please login to proceed with Buy Now", variant: "destructive" });
+      setLocation("/login");
+      return;
+    }
+    buyNowMutation.mutate({ productId: product._id, quantity });
+  };
 
   if (isLoading) {
     return (
@@ -241,23 +278,35 @@ export default function ProductDetail() {
               )}
             </div>
 
-            <div className="flex gap-3 mb-8">
+            <div className="flex flex-col gap-3 mb-8">
+              <div className="flex gap-3">
+                <Button
+                  className="flex-1"
+                  disabled={!product.inStock || addToCartMutation.isPending}
+                  onClick={() => addToCartMutation.mutate({ productId: product._id, quantity })}
+                  data-testid="button-add-to-cart"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Cart
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => addToWishlistMutation.mutate(product._id)}
+                  disabled={addToWishlistMutation.isPending}
+                  data-testid="button-add-to-wishlist"
+                >
+                  <Heart className="h-4 w-4" />
+                </Button>
+              </div>
               <Button
-                className="flex-1"
-                disabled={!product.inStock || addToCartMutation.isPending}
-                onClick={() => addToCartMutation.mutate({ productId: product._id, quantity })}
-                data-testid="button-add-to-cart"
+                className="w-full"
+                variant="default"
+                disabled={!product.inStock || buyNowMutation.isPending}
+                onClick={handleBuyNow}
+                data-testid="button-buy-now"
               >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Add to Cart
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => addToWishlistMutation.mutate(product._id)}
-                disabled={addToWishlistMutation.isPending}
-                data-testid="button-add-to-wishlist"
-              >
-                <Heart className="h-4 w-4" />
+                <Zap className="h-4 w-4 mr-2" />
+                Buy Now
               </Button>
             </div>
 

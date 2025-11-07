@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { migrateGuestDataToServer } from "@/lib/migrateGuestData";
 
 export default function Login() {
   const { toast } = useToast();
@@ -23,9 +24,10 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/auth/login", "POST", data),
-    onSuccess: (data: any) => {
+    onSuccess: async (data: any) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      await migrateGuestDataToServer();
       toast({ title: "Login successful!" });
       setLocation("/");
     },
@@ -36,9 +38,10 @@ export default function Login() {
 
   const registerMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/auth/register", "POST", data),
-    onSuccess: (data: any) => {
+    onSuccess: async (data: any) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      await migrateGuestDataToServer();
       toast({ title: "Registration successful!" });
       setLocation("/");
     },

@@ -19,6 +19,7 @@ interface ProductCardProps {
   isBestseller?: boolean;
   onAddToCart?: () => void;
   onAddToWishlist?: () => void;
+  onBuyNow?: () => void;
   onClick?: () => void;
 }
 
@@ -36,6 +37,7 @@ export default function ProductCard({
   isBestseller,
   onAddToCart,
   onAddToWishlist,
+  onBuyNow,
   onClick,
 }: ProductCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -51,6 +53,11 @@ export default function ProductCard({
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     onAddToCart?.();
+  };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onBuyNow?.();
   };
 
   return (
@@ -93,7 +100,7 @@ export default function ProductCard({
           </div>
         )}
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-2">
           <Button 
             className="w-full bg-primary hover:bg-primary text-primary-foreground"
             onClick={handleAddToCart}
@@ -101,6 +108,14 @@ export default function ProductCard({
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
             Add to Cart
+          </Button>
+          <Button 
+            className="w-full"
+            variant="secondary"
+            onClick={handleBuyNow}
+            data-testid={`button-buy-now-${id}`}
+          >
+            Buy Now
           </Button>
         </div>
       </div>

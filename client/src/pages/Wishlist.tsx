@@ -7,33 +7,79 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, ShoppingCart, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { localStorageService } from "@/lib/localStorage";
+import { useState, useEffect } from "react";
 
 export default function Wishlist() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const token = localStorage.getItem("token");
+  const [guestWishlist, setGuestWishlist] = useState<any>(null);
 
   const { data: wishlist, isLoading, isError, error } = useQuery({
     queryKey: ["/api/wishlist"],
+    enabled: !!token,
   });
+
+  useEffect(() => {
+    if (!token) {
+      const localWishlist = localStorageService.getWishlist();
+      const fetchProducts = async () => {
+        const productPromises = localWishlist.products.map(async (productId) => {
+          const response = await fetch(`/api/products/${productId}`);
+          return response.json();
+        });
+        const products = await Promise.all(productPromises);
+        setGuestWishlist({ products });
+      };
+      if (localWishlist.products.length > 0) {
+        fetchProducts();
+      } else {
+        setGuestWishlist({ products: [] });
+      }
+    }
+  }, [token]);
 
   const isUnauthorized = isError && error && String(error).includes("401:");
 
   const removeFromWishlistMutation = useMutation({
-    mutationFn: (productId: string) => apiRequest(`/api/wishlist/${productId}`, "DELETE"),
+    mutationFn: (productId: string) => {
+      if (!token) {
+        localStorageService.removeFromWishlist(productId);
+        return Promise.resolve();
+      }
+      return apiRequest(`/api/wishlist/${productId}`, "DELETE");
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] });
+      if (token) {
+        queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] });
+      } else {
+        const localWishlist = localStorageService.getWishlist();
+        const fetchProducts = async () => {
+          const productPromises = localWishlist.products.map(async (productId) => {
+            const response = await fetch(`/api/products/${productId}`);
+            return response.json();
+          });
+          const products = await Promise.all(productPromises);
+          setGuestWishlist({ products });
+        };
+        fetchProducts();
+      }
       toast({ title: "Removed from wishlist" });
     },
   });
 
   const addToCartMutation = useMutation({
-    mutationFn: (productId: string) => apiRequest("/api/cart", "POST", { productId, quantity: 1 }),
+    mutationFn: (productId: string) => {
+      if (!token) {
+        localStorageService.addToCart(productId, 1);
+        return Promise.resolve();
+      }
+      return apiRequest("/api/cart", "POST", { productId, quantity: 1 });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
       toast({ title: "Added to cart successfully" });
-    },
-    onError: () => {
-      toast({ title: "Please login to add to cart", variant: "destructive" });
     },
   });
 
@@ -41,7 +87,7 @@ export default function Wishlist() {
     addToCartMutation.mutate(productId);
   };
 
-  if (isLoading) {
+  if (token && isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -53,39 +99,19 @@ export default function Wishlist() {
     );
   }
 
-  if (isError || !wishlist) {
+  if (!token && !guestWishlist) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-          <p className="mb-4">
-            {isUnauthorized 
-              ? "Please login to view your wishlist" 
-              : isError 
-                ? "Failed to load wishlist. Please try again." 
-                : "Loading..."}
-          </p>
-          <div className="flex gap-2 justify-center">
-            {isUnauthorized ? (
-              <Button onClick={() => setLocation("/login")} data-testid="button-login">
-                Login
-              </Button>
-            ) : isError ? (
-              <Button 
-                onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] })}
-                data-testid="button-retry"
-              >
-                Retry
-              </Button>
-            ) : null}
-          </div>
+          Loading wishlist...
         </div>
         <Footer />
       </div>
     );
   }
 
-  const products = (wishlist as any)?.products || [];
+  const products = token ? ((wishlist as any)?.products || []) : (guestWishlist?.products || []);
 
   if (products.length === 0) {
     return (

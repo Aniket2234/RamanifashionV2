@@ -8,35 +8,96 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Trash2, ShoppingBag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { localStorageService } from "@/lib/localStorage";
+import { useState, useEffect } from "react";
 
 export default function Cart() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const token = localStorage.getItem("token");
+  const [guestCart, setGuestCart] = useState<any>(null);
 
   const { data: cart, isLoading } = useQuery({
     queryKey: ["/api/cart"],
+    enabled: !!token,
   });
 
+  useEffect(() => {
+    if (!token) {
+      const localCart = localStorageService.getCart();
+      const fetchProducts = async () => {
+        const productPromises = localCart.items.map(async (item) => {
+          const response = await fetch(`/api/products/${item.productId}`);
+          const product = await response.json();
+          return { productId: product, quantity: item.quantity };
+        });
+        const items = await Promise.all(productPromises);
+        setGuestCart({ items });
+      };
+      if (localCart.items.length > 0) {
+        fetchProducts();
+      } else {
+        setGuestCart({ items: [] });
+      }
+    }
+  }, [token]);
+
   const updateQuantityMutation = useMutation({
-    mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) =>
-      apiRequest(`/api/cart/${productId}`, "PUT", { quantity }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+    mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) => {
+      if (!token) {
+        localStorageService.updateCartQuantity(productId, quantity);
+        return Promise.resolve();
+      }
+      return apiRequest(`/api/cart/${productId}`, "PUT", { quantity });
     },
-    onError: () => {
-      toast({ title: "Please login to manage cart", variant: "destructive" });
+    onSuccess: () => {
+      if (token) {
+        queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+      } else {
+        const localCart = localStorageService.getCart();
+        const fetchProducts = async () => {
+          const productPromises = localCart.items.map(async (item) => {
+            const response = await fetch(`/api/products/${item.productId}`);
+            const product = await response.json();
+            return { productId: product, quantity: item.quantity };
+          });
+          const items = await Promise.all(productPromises);
+          setGuestCart({ items });
+        };
+        fetchProducts();
+      }
     },
   });
 
   const removeItemMutation = useMutation({
-    mutationFn: (productId: string) => apiRequest(`/api/cart/${productId}`, "DELETE"),
+    mutationFn: (productId: string) => {
+      if (!token) {
+        localStorageService.removeFromCart(productId);
+        return Promise.resolve();
+      }
+      return apiRequest(`/api/cart/${productId}`, "DELETE");
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+      if (token) {
+        queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+      } else {
+        const localCart = localStorageService.getCart();
+        const fetchProducts = async () => {
+          const productPromises = localCart.items.map(async (item) => {
+            const response = await fetch(`/api/products/${item.productId}`);
+            const product = await response.json();
+            return { productId: product, quantity: item.quantity };
+          });
+          const items = await Promise.all(productPromises);
+          setGuestCart({ items });
+        };
+        fetchProducts();
+      }
       toast({ title: "Item removed from cart" });
     },
   });
 
-  if (isLoading) {
+  if (token && isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -48,7 +109,19 @@ export default function Cart() {
     );
   }
 
-  const items = (cart as any)?.items || [];
+  if (!token && !guestCart) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+          Loading cart...
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const items = token ? ((cart as any)?.items || []) : (guestCart?.items || []);
   const subtotal = items.reduce((sum: number, item: any) => {
     return sum + (item.productId?.price || 0) * item.quantity;
   }, 0);
@@ -195,7 +268,18 @@ export default function Cart() {
                   <span className="text-primary" data-testid="text-total">₹{total}</span>
                 </div>
 
-                <Button className="w-full" onClick={() => setLocation("/checkout")} data-testid="button-checkout">
+                <Button 
+                  className="w-full" 
+                  onClick={() => {
+                    if (!token) {
+                      toast({ title: "Please login to proceed with checkout", variant: "destructive" });
+                      setLocation("/login");
+                    } else {
+                      setLocation("/checkout");
+                    }
+                  }} 
+                  data-testid="button-checkout"
+                >
                   Proceed to Checkout
                 </Button>
 
