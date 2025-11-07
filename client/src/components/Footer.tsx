@@ -1,9 +1,11 @@
-import { Mail, Send } from "lucide-react";
-import { SiInstagram, SiWhatsapp, SiFacebook } from "react-icons/si";
+import { Send } from "lucide-react";
+import { SiWhatsapp } from "react-icons/si";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import logoImage from "@assets/PNG__B_ LOGO_1762442171742.png";
+import instagramIcon from "@assets/instagram_1762445939344.png";
+import facebookIcon from "@assets/communication_1762445935759.png";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -21,45 +23,48 @@ export default function Footer() {
             <img 
               src={logoImage}
               alt="Ramani Fashion" 
-              className="h-16 w-auto object-contain mb-4"
+              className="h-24 md:h-28 w-auto object-contain mb-4"
               data-testid="img-footer-logo"
             />
             <p className="text-sm text-muted-foreground mb-4">
               Your destination for authentic handloom sarees and traditional Indian ethnic wear.
             </p>
-            <div className="flex gap-3">
+            <div className="flex items-start gap-4">
               <a 
                 href="https://instagram.com/ramanifashion" 
                 target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white hover:scale-110 transition-transform"
-                data-testid="button-instagram"
+                rel="noopener noreferrer" 
+                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
+                data-testid="link-instagram-footer"
               >
-                <SiInstagram className="h-5 w-5" />
+                <img src={instagramIcon} alt="Instagram" className="h-6 w-6" />
+                <span className="text-xs font-medium text-black">@ramanifashion</span>
               </a>
               <a 
                 href="https://facebook.com/ramanifashion" 
                 target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform"
-                data-testid="button-facebook"
+                rel="noopener noreferrer" 
+                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
+                data-testid="link-facebook-footer"
               >
-                <SiFacebook className="h-5 w-5" />
+                <img src={facebookIcon} alt="Facebook" className="h-6 w-6" />
+                <span className="text-xs font-medium text-black">@ramanifashion</span>
               </a>
               <a 
                 href="https://wa.me/915555555555" 
                 target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white hover:scale-110 transition-transform"
-                data-testid="button-whatsapp"
+                rel="noopener noreferrer" 
+                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
+                data-testid="link-whatsapp-footer"
               >
-                <SiWhatsapp className="h-5 w-5" />
+                <SiWhatsapp className="h-6 w-6 text-green-600" />
+                <span className="text-xs font-medium text-black">+91 5555555555</span>
               </a>
             </div>
           </div>
 
           <div>
-            <h4 className="font-semibold text-lg mb-4 text-primary">Trending Collection</h4>
+            <h4 className="font-semibold text-lg mb-4 text-primary">Categories</h4>
             <ul className="space-y-2 text-sm">
               <li><a href="/products?category=Jamdani Paithani" className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-jamdani">Jamdani Paithani</a></li>
               <li><a href="/products?category=Khun Irkal" className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-khun">Khun / Irkal (Ilkal)</a></li>
