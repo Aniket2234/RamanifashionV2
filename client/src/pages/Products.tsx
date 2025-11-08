@@ -50,7 +50,7 @@ export default function Products() {
     setIsTrending(trendingParam === 'true');
     
     setPage(1);
-  }, [location]);
+  }, [location, window.location.search]);
 
   const toggleSection = (section: string) => {
     setOpenSections(prev =>

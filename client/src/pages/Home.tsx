@@ -427,6 +427,14 @@ export default function Home() {
                 className="flex flex-col items-center group cursor-pointer"
                 variants={fadeInUp}
                 transition={{ duration: 0.5 }}
+                onClick={() => {
+                  if (category.name === "Sale") {
+                    setLocation("/sale");
+                  } else {
+                    setLocation(`/products?category=${encodeURIComponent(category.name)}`);
+                  }
+                }}
+                data-testid={`category-card-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 <div className="w-full aspect-[2/3] overflow-hidden rounded-lg mb-4 shadow-md hover:shadow-xl transition-shadow duration-300">
                   <img 
