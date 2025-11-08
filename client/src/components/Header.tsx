@@ -44,15 +44,13 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
       const pathname = url.pathname;
       const searchParams = url.searchParams;
       
-      const isTrending = pathname === "/products" && searchParams.get("isTrending") === "true";
       const hasCategory = pathname === "/products" && searchParams.has("category");
-      const isProducts = pathname === "/products" && !isTrending;
       
       return {
         isHome: pathname === "/",
         isNewArrivals: pathname === "/new-arrivals",
-        isTrending,
-        isCategories: isProducts && (hasCategory || (!isTrending && pathname === "/products")),
+        isTrending: pathname === "/trending-collection",
+        isCategories: pathname === "/products" && (hasCategory || pathname === "/products"),
         isSale: pathname === "/sale",
         isAbout: pathname === "/about"
       };
@@ -61,8 +59,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
       return {
         isHome: location === "/",
         isNewArrivals: location === "/new-arrivals",
-        isTrending: location.includes("isTrending=true"),
-        isCategories: location.includes("/products") && !location.includes("isTrending"),
+        isTrending: location === "/trending-collection",
+        isCategories: location.includes("/products"),
         isSale: location === "/sale",
         isAbout: location === "/about"
       };
@@ -333,7 +331,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link 
-                  href="/products?isTrending=true" 
+                  href="/trending-collection" 
                   className={`nav-link px-4 py-2 tracking-wide text-base font-medium ${navState.isTrending ? "active text-primary" : ""}`} 
                   data-testid="link-trending-collection"
                 >

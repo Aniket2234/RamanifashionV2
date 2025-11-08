@@ -16,6 +16,7 @@ import Collections from "@/pages/Collections";
 import AboutUs from "@/pages/AboutUs";
 import Sale from "@/pages/Sale";
 import NewArrivals from "@/pages/NewArrivals";
+import TrendingCollection from "@/pages/TrendingCollection";
 import Profile from "@/pages/Profile";
 import Orders from "@/pages/Orders";
 import Wishlist from "@/pages/Wishlist";
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/categories" component={Products} />
       <Route path="/new-arrivals" component={NewArrivals} />
+      <Route path="/trending-collection" component={TrendingCollection} />
       <Route path="/occasions" component={Occasions} />
       <Route path="/collections" component={Collections} />
       <Route path="/about" component={AboutUs} />
