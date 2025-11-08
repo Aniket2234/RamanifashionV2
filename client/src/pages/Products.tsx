@@ -420,7 +420,7 @@ export default function Products() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {products.map((product: any) => {
                     const discount = product.originalPrice 
                       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -432,6 +432,7 @@ export default function Products() {
                         id={product._id}
                         name={product.name}
                         image={product.images?.[0] || "/api/placeholder/400/600"}
+                        secondaryImage={product.images?.[1]}
                         price={product.price}
                         originalPrice={product.originalPrice}
                         discount={discount || undefined}
@@ -439,9 +440,6 @@ export default function Products() {
                         reviewCount={product.reviewCount}
                         isNew={product.isNew}
                         isBestseller={product.isBestseller}
-                        onAddToCart={() => console.log(`Added ${product.name} to cart`)}
-                        onAddToWishlist={() => console.log(`Added ${product.name} to wishlist`)}
-                        onClick={() => console.log(`Clicked ${product.name}`)}
                       />
                     );
                   })}

@@ -87,13 +87,14 @@ export default function NewArrivals() {
                 <p className="text-muted-foreground">No new arrivals found.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {sortedProducts.map((product: any) => (
                   <ProductCard
                     key={product._id}
                     id={product._id}
                     name={product.name}
                     image={product.images?.[0] || "/placeholder.jpg"}
+                    secondaryImage={product.images?.[1]}
                     price={product.price}
                     originalPrice={product.originalPrice}
                     discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
@@ -101,9 +102,6 @@ export default function NewArrivals() {
                     reviewCount={product.reviewCount}
                     isNew={product.isNew}
                     isBestseller={product.isBestseller}
-                    onClick={() => setLocation(`/product/${product._id}`)}
-                    onAddToCart={() => {}}
-                    onAddToWishlist={() => {}}
                   />
                 ))}
               </div>

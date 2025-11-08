@@ -4,6 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { localStorageService } from "@/lib/localStorage";
 
 interface ProductCardProps {
   id: string;
@@ -43,21 +47,87 @@ export default function ProductCard({
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [currentImage, setCurrentImage] = useState(image);
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  const addToCartMutation = useMutation({
+    mutationFn: (data: any) => apiRequest("/api/cart", "POST", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+      toast({ title: "Added to cart successfully!" });
+    },
+    onError: () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        localStorageService.addToCart(id, 1);
+        queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+        toast({ title: "Added to cart successfully!" });
+      } else {
+        toast({ title: "Failed to add to cart", variant: "destructive" });
+      }
+    },
+  });
+
+  const addToWishlistMutation = useMutation({
+    mutationFn: (productId: string) => apiRequest(`/api/wishlist/${productId}`, "POST"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] });
+      toast({ title: "Added to wishlist!" });
+    },
+    onError: () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        localStorageService.addToWishlist(id);
+        queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] });
+        toast({ title: "Added to wishlist!" });
+      } else {
+        toast({ title: "Failed to add to wishlist", variant: "destructive" });
+      }
+    },
+  });
+
+  const buyNowMutation = useMutation({
+    mutationFn: (data: any) => apiRequest("/api/cart", "POST", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+      setLocation("/checkout");
+    },
+    onError: () => {
+      toast({ title: "Failed to proceed with Buy Now", variant: "destructive" });
+    },
+  });
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsWishlisted(!isWishlisted);
-    onAddToWishlist?.();
+    if (onAddToWishlist) {
+      onAddToWishlist();
+    } else {
+      addToWishlistMutation.mutate(id);
+    }
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onAddToCart?.();
+    if (onAddToCart) {
+      onAddToCart();
+    } else {
+      addToCartMutation.mutate({ productId: id, quantity: 1 });
+    }
   };
 
   const handleBuyNow = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onBuyNow?.();
+    if (onBuyNow) {
+      onBuyNow();
+    } else {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast({ title: "Please login to proceed with Buy Now", variant: "destructive" });
+        setLocation("/login");
+        return;
+      }
+      buyNowMutation.mutate({ productId: id, quantity: 1 });
+    }
   };
 
   return (
