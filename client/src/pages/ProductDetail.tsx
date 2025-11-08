@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { localStorageService } from "@/lib/localStorage";
 import ProductCard from "@/components/ProductCard";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +21,12 @@ export default function ProductDetail() {
   const [, setLocation] = useLocation();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [similarSort, setSimilarSort] = useState("rating-desc");
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSelectedImage(0);
+  }, [id]);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["/api/products", id],
@@ -30,13 +38,16 @@ export default function ProductDetail() {
   });
 
   const { data: similarProducts } = useQuery({
-    queryKey: ["/api/products", "similar", product?.category, id],
+    queryKey: ["/api/products", "similar", product?.category, id, similarSort],
     queryFn: async () => {
       if (!product?.category) return [];
-      const response = await fetch(`/api/products?category=${encodeURIComponent(product.category)}&limit=4`);
+      const [sortField, sortOrder] = similarSort.split("-");
+      const response = await fetch(
+        `/api/products?category=${encodeURIComponent(product.category)}&sort=${sortField}&order=${sortOrder}&limit=8`
+      );
       if (!response.ok) return [];
       const data = await response.json();
-      return data.products?.filter((p: any) => p._id !== id).slice(0, 4) || [];
+      return data.products?.filter((p: any) => p._id !== id).slice(0, 8) || [];
     },
     enabled: !!product?.category,
   });
@@ -143,16 +154,34 @@ export default function ProductDetail() {
           <span className="text-foreground">{product.name}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <div>
-            <div className="mb-4 bg-card rounded-md overflow-hidden max-w-md mx-auto">
-              <img 
-                src={images[selectedImage]} 
-                alt={product.name}
-                className="w-full h-auto aspect-[2/3] object-cover"
-                data-testid="img-product-main"
-              />
-            </div>
+        <motion.div 
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div 
+                key={selectedImage}
+                className="mb-4 bg-card rounded-md overflow-hidden max-w-md mx-auto"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+              >
+                <img 
+                  src={images[selectedImage]} 
+                  alt={product.name}
+                  className="w-full h-auto aspect-[2/3] object-cover"
+                  data-testid="img-product-main"
+                />
+              </motion.div>
+            </AnimatePresence>
             
             <div className="grid grid-cols-4 gap-2">
               {images.slice(0, 4).map((img: string, idx: number) => (
@@ -168,9 +197,13 @@ export default function ProductDetail() {
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <div className="flex gap-2 mb-2">
               {product.isNew && <Badge variant="secondary" data-testid="badge-new">New</Badge>}
               {product.isBestseller && <Badge variant="secondary" data-testid="badge-bestseller">Bestseller</Badge>}
@@ -343,8 +376,8 @@ export default function ProductDetail() {
                 </CardContent>
               </Card>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {product.specifications && (
           <Card className="mb-8">
@@ -389,25 +422,63 @@ export default function ProductDetail() {
         )}
 
         {similarProducts && similarProducts.length > 0 && (
-          <div>
-            <h2 className="text-2xl font-bold mb-6">Similar Products</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {similarProducts.map((similarProduct: any) => (
-                <ProductCard
-                  key={similarProduct._id}
-                  id={similarProduct._id}
-                  name={similarProduct.name}
-                  price={similarProduct.price}
-                  originalPrice={similarProduct.originalPrice}
-                  image={similarProduct.images?.[0] || "/api/placeholder/400/600"}
-                  rating={similarProduct.rating}
-                  reviewCount={similarProduct.reviewCount}
-                  isNew={similarProduct.isNew}
-                  isBestseller={similarProduct.isBestseller}
-                />
-              ))}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Similar Products</h2>
+              <Select value={similarSort} onValueChange={setSimilarSort}>
+                <SelectTrigger className="w-48" data-testid="select-similar-sort">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="rating-desc">Highest Rated</SelectItem>
+                  <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                  <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                  <SelectItem value="reviewCount-desc">Most Reviewed</SelectItem>
+                  <SelectItem value="createdAt-desc">Newest First</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </div>
+            <motion.div 
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    staggerChildren: 0.1
+                  }
+                }
+              }}
+            >
+              {similarProducts.map((similarProduct: any, index: number) => (
+                <motion.div
+                  key={similarProduct._id}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 }
+                  }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <ProductCard
+                    id={similarProduct._id}
+                    name={similarProduct.name}
+                    price={similarProduct.price}
+                    originalPrice={similarProduct.originalPrice}
+                    image={similarProduct.images?.[0] || "/api/placeholder/400/600"}
+                    rating={similarProduct.rating}
+                    reviewCount={similarProduct.reviewCount}
+                    isNew={similarProduct.isNew}
+                    isBestseller={similarProduct.isBestseller}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
         )}
       </div>
 

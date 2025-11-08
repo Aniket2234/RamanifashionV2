@@ -86,14 +86,19 @@ export default function Products() {
     },
   });
 
-  const { data: filtersData } = useQuery({
+  const { data: filtersData } = useQuery<{
+    categories: string[];
+    fabrics: string[];
+    colors: string[];
+    occasions: string[];
+  }>({
     queryKey: ["/api/filters"],
   });
 
   const products = productsData?.products || [];
   const pagination = productsData?.pagination || { total: 0, pages: 1 };
 
-  const categories = filtersData?.categories || ["Silk Sarees", "Cotton Sarees", "Designer Sarees", "Bridal Sarees", "Party Wear", "Casual Wear"];
+  const categories = filtersData?.categories || ["Jamdani Paithani", "Khun / Irkal (Ilkal)", "Ajrakh Modal", "Mul Mul Cotton", "Khadi Cotton", "Patch Work", "Pure Linen"];
   const fabrics = filtersData?.fabrics || ["Silk", "Cotton", "Georgette", "Chiffon", "Net", "Crepe", "Chanderi", "Linen"];
   const colors = filtersData?.colors || ["Red", "Blue", "Green", "Pink", "Yellow", "Black", "White", "Purple", "Maroon", "Grey"];
   const occasions = filtersData?.occasions || ["Wedding", "Party", "Festival", "Casual", "Office"];
@@ -266,7 +271,7 @@ export default function Products() {
                   <ChevronDown className={`h-4 w-4 transition-transform ${openSections.includes("categories") ? "rotate-180" : ""}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="space-y-2 pt-2">
-                  {categories.map((category) => (
+                  {categories.map((category: string) => (
                     <div key={category} className="flex items-center space-x-2">
                       <Checkbox 
                         id={category} 
@@ -320,7 +325,7 @@ export default function Products() {
                   <ChevronDown className={`h-4 w-4 transition-transform ${openSections.includes("fabric") ? "rotate-180" : ""}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="space-y-2 pt-2">
-                  {fabrics.map((fabric) => (
+                  {fabrics.map((fabric: string) => (
                     <div key={fabric} className="flex items-center space-x-2">
                       <Checkbox 
                         id={fabric} 
@@ -346,7 +351,7 @@ export default function Products() {
                   <ChevronDown className={`h-4 w-4 transition-transform ${openSections.includes("occasion") ? "rotate-180" : ""}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="space-y-2 pt-2">
-                  {occasions.map((occasion) => (
+                  {occasions.map((occasion: string) => (
                     <div key={occasion} className="flex items-center space-x-2">
                       <Checkbox 
                         id={occasion} 
@@ -373,7 +378,7 @@ export default function Products() {
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-2">
                   <div className="grid grid-cols-5 gap-2">
-                    {colors.map((color) => (
+                    {colors.map((color: string) => (
                       <button
                         key={color}
                         className={`w-8 h-8 rounded-full border-2 hover-elevate ${
