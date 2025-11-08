@@ -682,7 +682,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { username, password } = req.body;
 
-      // Hardcoded admin credentials for now (TODO: move to database)
+      // ⚠️ SECURITY WARNING: These credentials are hardcoded and should be moved to a secure database
+      // TODO: URGENT - Move admin credentials to database with bcrypt password hashing
+      // TODO: Add environment variables for sensitive configuration
+      // TODO: Implement proper admin user management with role-based access control
       const ADMIN_USERNAME = "admin@ramanifashion.com";
       const ADMIN_PASSWORD = "admin123";
 
