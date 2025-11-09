@@ -526,14 +526,13 @@ export default function ProductManagement() {
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Silk Sarees" data-testid="option-silk-sarees">Silk Sarees</SelectItem>
-                        <SelectItem value="Cotton Sarees" data-testid="option-cotton-sarees">Cotton Sarees</SelectItem>
-                        <SelectItem value="Designer Sarees" data-testid="option-designer-sarees">Designer Sarees</SelectItem>
-                        <SelectItem value="Banarasi Sarees" data-testid="option-banarasi-sarees">Banarasi Sarees</SelectItem>
-                        <SelectItem value="Kanjivaram Sarees" data-testid="option-kanjivaram-sarees">Kanjivaram Sarees</SelectItem>
-                        <SelectItem value="Georgette Sarees" data-testid="option-georgette-sarees">Georgette Sarees</SelectItem>
-                        <SelectItem value="Chiffon Sarees" data-testid="option-chiffon-sarees">Chiffon Sarees</SelectItem>
-                        <SelectItem value="Printed Sarees" data-testid="option-printed-sarees">Printed Sarees</SelectItem>
+                        <SelectItem value="Jamdani Paithani" data-testid="option-jamdani-paithani">Jamdani Paithani</SelectItem>
+                        <SelectItem value="Khun Irkal" data-testid="option-khun-irkal">Khun / Irkal (Ilkal)</SelectItem>
+                        <SelectItem value="Ajrakh Modal" data-testid="option-ajrakh-modal">Ajrakh Modal</SelectItem>
+                        <SelectItem value="Mul Mul Cotton" data-testid="option-mul-mul-cotton">Mul Mul Cotton</SelectItem>
+                        <SelectItem value="Khadi Cotton" data-testid="option-khadi-cotton">Khadi Cotton</SelectItem>
+                        <SelectItem value="Patch Work" data-testid="option-patch-work">Patch Work</SelectItem>
+                        <SelectItem value="Pure Linen" data-testid="option-pure-linen">Pure Linen</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
