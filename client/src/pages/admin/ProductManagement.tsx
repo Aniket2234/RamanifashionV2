@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import {
@@ -28,7 +29,8 @@ import {
   Download,
   FileUp,
   Search,
-  X
+  X,
+  Link as LinkIcon
 } from "lucide-react";
 
 export default function ProductManagement() {
@@ -49,6 +51,7 @@ export default function ProductManagement() {
   // Image upload states
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
 
   const [productForm, setProductForm] = useState({
     name: "",
@@ -137,6 +140,41 @@ export default function ProductManagement() {
 
   const removeImage = (index: number) => {
     setUploadedImages(uploadedImages.filter((_, i) => i !== index));
+  };
+
+  // Handle image URL addition
+  const handleAddImageUrl = () => {
+    if (!imageUrl.trim()) {
+      toast({ 
+        title: "URL required", 
+        description: "Please enter a valid image URL",
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    if (uploadedImages.length >= 5) {
+      toast({ 
+        title: "Too many images", 
+        description: "Maximum 5 images allowed per product",
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    // Validate that it's a valid URL
+    try {
+      new URL(imageUrl);
+      setUploadedImages([...uploadedImages, imageUrl]);
+      setImageUrl("");
+      toast({ title: "Image URL added successfully!" });
+    } catch (error) {
+      toast({ 
+        title: "Invalid URL", 
+        description: "Please enter a valid image URL",
+        variant: "destructive" 
+      });
+    }
   };
 
   // Excel import mutation
