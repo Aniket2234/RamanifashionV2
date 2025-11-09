@@ -23,7 +23,7 @@ export default function Products() {
   const [sortBy, setSortBy] = useState("");
   const [order, setOrder] = useState("");
   const [page, setPage] = useState(1);
-  const [priceRange, setPriceRange] = useState([0, 50000]);
+  const [priceRange, setPriceRange] = useState([0, 0]);
   const [priceFilterActive, setPriceFilterActive] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
@@ -205,7 +205,7 @@ export default function Products() {
     setSelectedFabrics([]);
     setSelectedColors([]);
     setSelectedOccasions([]);
-    const maxPrice = priceRangeData?.maxPrice || 50000;
+    const maxPrice = priceRangeData?.maxPrice || 0;
     setPriceRange([0, maxPrice]);
     setPriceFilterActive(false);
     setInStockOnly(false);
@@ -366,7 +366,7 @@ export default function Products() {
                       setPage(1);
                     }}
                     min={priceRangeData?.minPrice || 0}
-                    max={priceRangeData?.maxPrice || 50000}
+                    max={priceRangeData?.maxPrice || 0}
                     step={500}
                     data-testid="slider-price-range"
                   />
@@ -693,7 +693,7 @@ export default function Products() {
                         setPage(1);
                       }}
                       min={priceRangeData?.minPrice || 0}
-                      max={priceRangeData?.maxPrice || 50000}
+                      max={priceRangeData?.maxPrice || 0}
                       step={100}
                     />
                     <div className="flex items-center justify-between text-sm">

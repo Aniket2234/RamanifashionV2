@@ -12,7 +12,7 @@ const occasions = ["Wedding", "Party", "Festival", "Casual", "Office"];
 const colors = ["Red", "Blue", "Green", "Pink", "Yellow", "Black", "White"];
 
 export default function FilterSidebar() {
-  const [priceRange, setPriceRange] = useState([500, 50000]);
+  const [priceRange, setPriceRange] = useState([0, 0]);
   const [openSections, setOpenSections] = useState<string[]>(["categories", "price", "fabric"]);
 
   const toggleSection = (section: string) => {
@@ -64,8 +64,8 @@ export default function FilterSidebar() {
           <Slider
             value={priceRange}
             onValueChange={setPriceRange}
-            min={500}
-            max={50000}
+            min={0}
+            max={10000}
             step={500}
             data-testid="slider-price-range"
           />

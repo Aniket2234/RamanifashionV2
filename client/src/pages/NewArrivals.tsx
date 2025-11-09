@@ -22,7 +22,7 @@ export default function NewArrivals() {
   const [sortBy, setSortBy] = useState("");
   const [order, setOrder] = useState("");
   const [page, setPage] = useState(1);
-  const [priceRange, setPriceRange] = useState([0, 50000]);
+  const [priceRange, setPriceRange] = useState([0, 0]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -192,7 +192,7 @@ export default function NewArrivals() {
     setSelectedColors([]);
     setSelectedOccasions([]);
     const minPrice = priceRangeData?.minPrice || 0;
-    const maxPrice = priceRangeData?.maxPrice || 50000;
+    const maxPrice = priceRangeData?.maxPrice || 0;
     setPriceRange([minPrice, maxPrice]);
     setInStockOnly(false);
     setPage(1);
@@ -363,7 +363,7 @@ export default function NewArrivals() {
                       setPage(1);
                     }}
                     min={priceRangeData?.minPrice || 0}
-                    max={priceRangeData?.maxPrice || 50000}
+                    max={priceRangeData?.maxPrice || 0}
                     step={100}
                     data-testid="slider-price-range"
                   />
@@ -675,7 +675,7 @@ export default function NewArrivals() {
                         setPage(1);
                       }}
                       min={priceRangeData?.minPrice || 0}
-                      max={priceRangeData?.maxPrice || 50000}
+                      max={priceRangeData?.maxPrice || 0}
                       step={500}
                     />
                     <div className="flex items-center justify-between text-sm">
