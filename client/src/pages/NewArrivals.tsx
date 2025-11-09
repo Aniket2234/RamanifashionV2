@@ -128,23 +128,20 @@ export default function NewArrivals() {
     minPrice: number;
     maxPrice: number;
   }>({
-    queryKey: ["/api/price-range", priceRangeParams.toString()],
+    queryKey: [`/api/price-range?${priceRangeParams.toString()}`],
   });
 
   // Update price range when API data changes - clamp values to new bounds
   useEffect(() => {
     if (priceRangeData) {
-      console.log('🔍 New Arrivals - Price Range Data from API:', priceRangeData);
       if (priceRangeData.maxPrice > 0) {
         setPriceRange(prev => {
           const newMin = Math.max(priceRangeData.minPrice, Math.min(prev[0], priceRangeData.maxPrice));
           const newMax = Math.min(priceRangeData.maxPrice, Math.max(prev[1], priceRangeData.minPrice));
-          console.log('✅ Setting price range - Min:', newMin, 'Max:', newMax);
           return [newMin, newMax];
         });
       } else {
         // If no products, use fallback
-        console.log('⚠️ No products found, using fallback range [0, 10000]');
         setPriceRange([0, 10000]);
       }
     }
@@ -374,8 +371,8 @@ export default function NewArrivals() {
                       setPriceRange(val);
                       setPage(1);
                     }}
-                    min={priceRangeData?.minPrice || 0}
-                    max={priceRangeData?.maxPrice && priceRangeData.maxPrice > 0 ? priceRangeData.maxPrice : 10000}
+                    min={priceRange[0]}
+                    max={priceRange[1]}
                     step={100}
                     data-testid="slider-price-range"
                   />
