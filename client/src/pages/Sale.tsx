@@ -23,6 +23,7 @@ export default function Sale() {
   const [order, setOrder] = useState("desc");
   const [page, setPage] = useState(1);
   const [priceRange, setPriceRange] = useState([0, 50000]);
+  const [priceRangeInitialized, setPriceRangeInitialized] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -51,6 +52,14 @@ export default function Sale() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location]);
 
+  // Initialize price range from API data
+  useEffect(() => {
+    if (priceRangeData && !priceRangeInitialized) {
+      setPriceRange([priceRangeData.minPrice, priceRangeData.maxPrice]);
+      setPriceRangeInitialized(true);
+    }
+  }, [priceRangeData, priceRangeInitialized]);
+
   const toggleSection = (section: string) => {
     setOpenSections(prev =>
       prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
@@ -62,6 +71,7 @@ export default function Sale() {
     limit: "12",
     minPrice: priceRange[0].toString(),
     maxPrice: priceRange[1].toString(),
+    isSale: "true",
   });
 
   if (sortBy && order) {
@@ -103,8 +113,35 @@ export default function Sale() {
     queryKey: ["/api/filters"],
   });
 
-  const products = (productsData?.products || []).filter((p: any) => p.originalPrice && p.originalPrice > p.price);
-  const pagination = productsData?.pagination || { total: products.length, pages: 1 };
+  // Build price range query params (without page/limit)
+  const priceRangeParams = new URLSearchParams({
+    isSale: "true",
+  });
+  if (selectedCategories.length > 0) {
+    priceRangeParams.append("category", selectedCategories.join(","));
+  }
+  if (selectedFabrics.length > 0) {
+    priceRangeParams.append("fabric", selectedFabrics.join(","));
+  }
+  if (selectedColors.length > 0) {
+    priceRangeParams.append("color", selectedColors.join(","));
+  }
+  if (selectedOccasions.length > 0) {
+    priceRangeParams.append("occasion", selectedOccasions.join(","));
+  }
+  if (inStockOnly) {
+    priceRangeParams.append("inStock", "true");
+  }
+
+  const { data: priceRangeData } = useQuery<{
+    minPrice: number;
+    maxPrice: number;
+  }>({
+    queryKey: ["/api/price-range", priceRangeParams.toString()],
+  });
+
+  const products = productsData?.products || [];
+  const pagination = productsData?.pagination || { total: 0, pages: 1 };
 
   const categories = filtersData?.categories || ["Jamdani Paithani", "Khun / Irkal (Ilkal)", "Ajrakh Modal", "Mul Mul Cotton", "Khadi Cotton", "Patch Work", "Pure Linen"];
   const fabrics = filtersData?.fabrics || ["Silk", "Cotton", "Georgette", "Chiffon", "Net", "Crepe", "Chanderi", "Linen"];
@@ -156,7 +193,8 @@ export default function Sale() {
     setSelectedFabrics([]);
     setSelectedColors([]);
     setSelectedOccasions([]);
-    setPriceRange([0, 50000]);
+    const maxPrice = priceRangeData?.maxPrice || 50000;
+    setPriceRange([0, maxPrice]);
     setInStockOnly(false);
     setPage(1);
   };
@@ -332,8 +370,8 @@ export default function Sale() {
                       setPriceRange(val);
                       setPage(1);
                     }}
-                    min={0}
-                    max={50000}
+                    min={priceRangeData?.minPrice || 0}
+                    max={priceRangeData?.maxPrice || 50000}
                     step={100}
                     data-testid="slider-price-range"
                   />
@@ -644,9 +682,9 @@ export default function Sale() {
                         setPriceRange(val);
                         setPage(1);
                       }}
-                      min={500}
-                      max={50000}
-                      step={500}
+                      min={priceRangeData?.minPrice || 0}
+                      max={priceRangeData?.maxPrice || 50000}
+                      step={100}
                     />
                     <div className="flex items-center justify-between text-sm">
                       <span>₹{priceRange[0]}</span>
