@@ -4,6 +4,11 @@ import { connectDB } from "./db";
 import { Product, User, Cart, Wishlist, Order, Address, ContactSubmission, OTP } from "./models";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import XLSX from "xlsx";
+import { upload } from "./upload-config";
 
 const JWT_SECRET = process.env.SESSION_SECRET || "ramani-fashion-secret-key";
 const ADMIN_JWT_SECRET = process.env.ADMIN_SESSION_SECRET || "ramani-admin-secret-key-2024";
@@ -750,6 +755,222 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: 'Product not found' });
       }
       res.json({ message: 'Product deleted successfully' });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Admin Image Upload Route
+  app.post("/api/admin/upload-images", authenticateAdmin, (req, res) => {
+    upload.array('images', 5)(req, res, (err: any) => {
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({ error: 'File too large (max 5MB per file)' });
+        }
+        if (err.code === 'LIMIT_FILE_COUNT') {
+          return res.status(400).json({ error: 'Too many files (max 5 files)' });
+        }
+        return res.status(400).json({ error: err.message });
+      } else if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+
+      if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
+        return res.status(400).json({ error: 'No files uploaded' });
+      }
+
+      const files = req.files as Express.Multer.File[];
+      const uploadedUrls = files.map(file => `/uploads/${file.filename}`);
+
+      res.json({
+        success: true,
+        urls: uploadedUrls,
+        message: `${files.length} file(s) uploaded successfully`
+      });
+    });
+  });
+
+  // Admin Inventory Management Route
+  app.get("/api/admin/inventory", authenticateAdmin, async (req, res) => {
+    try {
+      const products = await Product.find()
+        .select('name category stockQuantity inStock price')
+        .sort({ stockQuantity: 1 })
+        .lean();
+
+      res.json(products);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/inventory/:id", authenticateAdmin, async (req, res) => {
+    try {
+      const { stockQuantity, inStock } = req.body;
+      const product = await Product.findByIdAndUpdate(
+        req.params.id,
+        { stockQuantity, inStock, updatedAt: new Date() },
+        { new: true }
+      );
+
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+
+      res.json(product);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Excel Import/Export Routes
+  app.post("/api/admin/products/import", authenticateAdmin, (req, res) => {
+    upload.single('file')(req, res, async (err: any) => {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      try {
+        // Read the Excel file
+        const workbook = XLSX.readFile(req.file.path);
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        // Delete the uploaded file after reading
+        fs.unlinkSync(req.file.path);
+
+        // Validate and insert products
+        const importedProducts = [];
+        const errors = [];
+
+        for (let i = 0; i < jsonData.length; i++) {
+          try {
+            const row: any = jsonData[i];
+            
+            // Map Excel columns to product fields
+            const productData: any = {
+              name: row.Name || row.name,
+              description: row.Description || row.description || '',
+              price: parseFloat(row.Price || row.price || 0),
+              originalPrice: row['Original Price'] || row.originalPrice ? parseFloat(row['Original Price'] || row.originalPrice) : undefined,
+              category: row.Category || row.category,
+              subcategory: row.Subcategory || row.subcategory,
+              fabric: row.Fabric || row.fabric,
+              color: row.Color || row.color,
+              occasion: row.Occasion || row.occasion,
+              pattern: row.Pattern || row.pattern,
+              workType: row['Work Type'] || row.workType,
+              blousePiece: row['Blouse Piece'] === 'Yes' || row.blousePiece === true,
+              sareeLength: row['Saree Length'] || row.sareeLength,
+              stockQuantity: parseInt(row['Stock Quantity'] || row.stockQuantity || '0'),
+              inStock: row['In Stock'] === 'Yes' || row.inStock === true || parseInt(row['Stock Quantity'] || row.stockQuantity || '0') > 0,
+              isNew: row['Is New'] === 'Yes' || row.isNew === true,
+              isBestseller: row['Is Bestseller'] === 'Yes' || row.isBestseller === true,
+              isTrending: row['Is Trending'] === 'Yes' || row.isTrending === true,
+            };
+
+            // Handle images (comma-separated URLs)
+            const imagesStr = row.Images || row.images || '';
+            if (imagesStr) {
+              productData.images = imagesStr.split(',').map((url: string) => url.trim()).filter(Boolean);
+            }
+
+            // Validate required fields
+            if (!productData.name || !productData.category || !productData.price) {
+              errors.push(`Row ${i + 2}: Missing required fields (Name, Category, or Price)`);
+              continue;
+            }
+
+            const product = new Product(productData);
+            await product.save();
+            importedProducts.push(product);
+          } catch (error: any) {
+            errors.push(`Row ${i + 2}: ${error.message}`);
+          }
+        }
+
+        res.json({
+          success: true,
+          imported: importedProducts.length,
+          errors: errors,
+          message: `Successfully imported ${importedProducts.length} products${errors.length > 0 ? ` with ${errors.length} errors` : ''}`
+        });
+      } catch (error: any) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+  });
+
+  app.get("/api/admin/products/export", authenticateAdmin, async (req, res) => {
+    try {
+      const products = await Product.find().lean();
+
+      // Convert products to Excel format
+      const excelData = products.map((product: any) => ({
+        Name: product.name,
+        Description: product.description,
+        Price: product.price,
+        'Original Price': product.originalPrice || '',
+        Category: product.category,
+        Subcategory: product.subcategory || '',
+        Fabric: product.fabric || '',
+        Color: product.color || '',
+        Occasion: product.occasion || '',
+        Pattern: product.pattern || '',
+        'Work Type': product.workType || '',
+        'Blouse Piece': product.blousePiece ? 'Yes' : 'No',
+        'Saree Length': product.sareeLength || '',
+        'Stock Quantity': product.stockQuantity || 0,
+        'In Stock': product.inStock ? 'Yes' : 'No',
+        'Is New': product.isNew ? 'Yes' : 'No',
+        'Is Bestseller': product.isBestseller ? 'Yes' : 'No',
+        'Is Trending': product.isTrending ? 'Yes' : 'No',
+        Images: (product.images || []).join(', '),
+      }));
+
+      // Create workbook and worksheet
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+      // Set column widths
+      const colWidths = [
+        { wch: 30 }, // Name
+        { wch: 50 }, // Description
+        { wch: 10 }, // Price
+        { wch: 12 }, // Original Price
+        { wch: 20 }, // Category
+        { wch: 20 }, // Subcategory
+        { wch: 15 }, // Fabric
+        { wch: 15 }, // Color
+        { wch: 15 }, // Occasion
+        { wch: 15 }, // Pattern
+        { wch: 15 }, // Work Type
+        { wch: 12 }, // Blouse Piece
+        { wch: 15 }, // Saree Length
+        { wch: 12 }, // Stock Quantity
+        { wch: 10 }, // In Stock
+        { wch: 10 }, // Is New
+        { wch: 12 }, // Is Bestseller
+        { wch: 12 }, // Is Trending
+        { wch: 80 }, // Images
+      ];
+      worksheet['!cols'] = colWidths;
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Products');
+
+      // Generate buffer
+      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+      // Set headers for file download
+      res.setHeader('Content-Disposition', `attachment; filename=products_export_${Date.now()}.xlsx`);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      
+      res.send(buffer);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

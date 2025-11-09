@@ -21,6 +21,9 @@ app.use(express.urlencoded({ extended: false }));
 // Serve static files from attached_assets directory
 app.use("/attached_assets", express.static(path.resolve("./attached_assets")));
 
+// Serve static files from uploads directory
+app.use("/uploads", express.static(path.resolve("./uploads")));
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
