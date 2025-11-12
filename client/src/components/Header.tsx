@@ -36,14 +36,13 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import logoImage from "@assets/PNG__B_ LOGO_1762442171742.png";
-import jamdaniImage from "@assets/stock_images/indian_woman_wearing_f25adcb7.jpg";
-import khunIrkalImage from "@assets/stock_images/indian_woman_wearing_65410991.jpg";
-import ajrakhModalImage from "@assets/stock_images/indian_woman_wearing_cf45c7a5.jpg";
-import mulMulCottonImage from "@assets/stock_images/indian_woman_wearing_f3665464.jpg";
-import khadiCottonImage from "@assets/stock_images/indian_woman_wearing_fa0df517.jpg";
-import patchWorkImage from "@assets/stock_images/indian_woman_wearing_f978c32c.jpg";
-import pureLinenImage from "@assets/stock_images/indian_woman_wearing_34d613a8.jpg";
-import silkImage from "@assets/stock_images/indian_woman_wearing_6bfefd32.jpg";
+import paithaniImage from "@/assets/paithani.png";
+import khunIrkalImage from "@/assets/khun-irkal.png";
+import ajrakhModalImage from "@/assets/ajrakh-modal.png";
+import mulCottonImage from "@/assets/mul-cotton.png";
+import khadiCottonImage from "@/assets/khadi-cotton.png";
+import patchWorkImage from "@/assets/patch-work.png";
+import pureLinenImage from "@/assets/pure-linen.png";
 
 interface HeaderProps {
   cartCount?: number;
@@ -373,27 +372,22 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                   CATEGORIES
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-white shadow-lg">
-                  <div className="w-[900px] max-w-6xl p-6">
-                    <div className="text-center mb-6">
-                      <h3 className="text-lg font-semibold text-white bg-pink-500 inline-block px-8 py-2 rounded-full">
-                        Shop by Category
-                      </h3>
-                    </div>
-                    <div className="grid grid-cols-4 gap-6">
+                  <div className="w-[95vw] max-w-7xl p-6">
+                    <div className="flex gap-4 overflow-x-auto pb-2">
                       <Link
                         href="/products?category=Jamdani Paithani"
-                        className="group flex flex-col items-center"
+                        className="group flex flex-col items-center flex-shrink-0"
                         data-testid="category-jamdani-paithani"
                       >
-                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
                           <img
-                            src={jamdaniImage}
+                            src={paithaniImage}
                             alt="Jamdani Paithani"
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <div className="mt-3 text-center">
-                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
                             Jamdani Paithani
                           </span>
                         </div>
@@ -401,10 +395,10 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Khun Irkal"
-                        className="group flex flex-col items-center"
+                        className="group flex flex-col items-center flex-shrink-0"
                         data-testid="category-khun-irkal"
                       >
-                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
                           <img
                             src={khunIrkalImage}
                             alt="Khun / Irkal (Ilkal)"
@@ -412,7 +406,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                           />
                         </div>
                         <div className="mt-3 text-center">
-                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
                             Khun / Irkal (Ilkal)
                           </span>
                         </div>
@@ -420,10 +414,10 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Ajrakh Modal"
-                        className="group flex flex-col items-center"
+                        className="group flex flex-col items-center flex-shrink-0"
                         data-testid="category-ajrakh-modal"
                       >
-                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
                           <img
                             src={ajrakhModalImage}
                             alt="Ajrakh Modal"
@@ -431,7 +425,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                           />
                         </div>
                         <div className="mt-3 text-center">
-                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
                             Ajrakh Modal
                           </span>
                         </div>
@@ -439,18 +433,18 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Mul Mul Cotton"
-                        className="group flex flex-col items-center"
+                        className="group flex flex-col items-center flex-shrink-0"
                         data-testid="category-mul-mul-cotton"
                       >
-                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
                           <img
-                            src={mulMulCottonImage}
+                            src={mulCottonImage}
                             alt="Mul Mul Cotton"
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <div className="mt-3 text-center">
-                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
                             Mul Mul Cotton
                           </span>
                         </div>
@@ -458,10 +452,10 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Khadi Cotton"
-                        className="group flex flex-col items-center"
+                        className="group flex flex-col items-center flex-shrink-0"
                         data-testid="category-khadi-cotton"
                       >
-                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
                           <img
                             src={khadiCottonImage}
                             alt="Khadi Cotton"
@@ -469,7 +463,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                           />
                         </div>
                         <div className="mt-3 text-center">
-                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
                             Khadi Cotton
                           </span>
                         </div>
@@ -477,10 +471,10 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Patch Work"
-                        className="group flex flex-col items-center"
+                        className="group flex flex-col items-center flex-shrink-0"
                         data-testid="category-patch-work"
                       >
-                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
                           <img
                             src={patchWorkImage}
                             alt="Patch Work"
@@ -488,7 +482,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                           />
                         </div>
                         <div className="mt-3 text-center">
-                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
                             Patch Work
                           </span>
                         </div>
@@ -496,10 +490,10 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Pure Linen"
-                        className="group flex flex-col items-center"
+                        className="group flex flex-col items-center flex-shrink-0"
                         data-testid="category-pure-linen"
                       >
-                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
                           <img
                             src={pureLinenImage}
                             alt="Pure Linen"
@@ -507,27 +501,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                           />
                         </div>
                         <div className="mt-3 text-center">
-                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
                             Pure Linen
-                          </span>
-                        </div>
-                      </Link>
-
-                      <Link
-                        href="/products?category=Silk"
-                        className="group flex flex-col items-center"
-                        data-testid="category-silk"
-                      >
-                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
-                          <img
-                            src={silkImage}
-                            alt="Silk"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="mt-3 text-center">
-                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
-                            Silk
                           </span>
                         </div>
                       </Link>
