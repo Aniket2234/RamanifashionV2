@@ -5,11 +5,11 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, Zap } from "lucide-react";
+import { Star, Heart, ShoppingBag, Truck, Shield, RotateCcw, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { localStorageService } from "@/lib/localStorage";
 import ProductCard from "@/components/ProductCard";
@@ -161,14 +161,30 @@ export default function ProductDetail() {
           transition={{ duration: 0.5 }}
         >
           <motion.div
+            className="flex flex-col lg:flex-row gap-4"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
+            <div className="flex flex-row lg:flex-col gap-2 order-2 lg:order-1 lg:max-w-[100px]">
+              {images.slice(0, 4).map((img: string, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedImage(idx)}
+                  className={`border-2 rounded-md overflow-hidden hover-elevate flex-shrink-0 ${
+                    selectedImage === idx ? 'border-primary' : 'border-border'
+                  }`}
+                  data-testid={`button-thumbnail-${idx}`}
+                >
+                  <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full aspect-square object-cover" />
+                </button>
+              ))}
+            </div>
+            
             <AnimatePresence mode="wait">
               <motion.div 
                 key={selectedImage}
-                className="mb-4 bg-card rounded-md overflow-hidden max-w-md mx-auto"
+                className="flex-1 bg-card rounded-md overflow-hidden order-1 lg:order-2"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -182,34 +198,19 @@ export default function ProductDetail() {
                 />
               </motion.div>
             </AnimatePresence>
-            
-            <div className="grid grid-cols-4 gap-2">
-              {images.slice(0, 4).map((img: string, idx: number) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImage(idx)}
-                  className={`border-2 rounded-md overflow-hidden hover-elevate ${
-                    selectedImage === idx ? 'border-primary' : 'border-border'
-                  }`}
-                  data-testid={`button-thumbnail-${idx}`}
-                >
-                  <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full aspect-square object-cover" />
-                </button>
-              ))}
-            </div>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            className="font-['Inter',sans-serif]"
           >
             <div className="flex gap-2 mb-2">
-              {product.isNew && <Badge variant="secondary" data-testid="badge-new">New</Badge>}
               {product.isBestseller && <Badge variant="secondary" data-testid="badge-bestseller">Bestseller</Badge>}
             </div>
 
-            <h1 className="text-3xl font-bold mb-4" data-testid="text-product-name">{product.name}</h1>
+            <h1 className="text-3xl font-bold mb-4 text-foreground" data-testid="text-product-name">{product.name}</h1>
 
             <div className="flex items-center gap-2 mb-4">
               <div className="flex items-center">
@@ -218,13 +219,13 @@ export default function ProductDetail() {
                     key={i}
                     className={`h-5 w-5 ${
                       i < Math.floor(product.rating || 0)
-                        ? 'fill-primary text-primary'
+                        ? 'fill-yellow-500 text-yellow-500'
                         : 'text-muted-foreground'
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-sm text-muted-foreground" data-testid="text-rating">
+              <span className="text-sm text-foreground font-medium" data-testid="text-rating">
                 {product.rating?.toFixed(1)} ({product.reviewCount} reviews)
               </span>
             </div>
@@ -245,47 +246,41 @@ export default function ProductDetail() {
               )}
             </div>
 
-            <p className="text-muted-foreground mb-6" data-testid="text-description">
-              {product.description}
-            </p>
-
-            <Separator className="my-6" />
-
             <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
               {product.category && (
                 <div>
                   <span className="text-muted-foreground">Category:</span>
-                  <span className="ml-2 font-medium">{product.category}</span>
+                  <span className="ml-2 font-medium text-foreground">{product.category}</span>
                 </div>
               )}
               {product.fabric && (
                 <div>
                   <span className="text-muted-foreground">Fabric:</span>
-                  <span className="ml-2 font-medium">{product.fabric}</span>
+                  <span className="ml-2 font-medium text-foreground">{product.fabric}</span>
                 </div>
               )}
               {product.color && (
                 <div>
                   <span className="text-muted-foreground">Color:</span>
-                  <span className="ml-2 font-medium">{product.color}</span>
+                  <span className="ml-2 font-medium text-foreground">{product.color}</span>
                 </div>
               )}
               {product.occasion && (
                 <div>
                   <span className="text-muted-foreground">Occasion:</span>
-                  <span className="ml-2 font-medium">{product.occasion}</span>
+                  <span className="ml-2 font-medium text-foreground">{product.occasion}</span>
                 </div>
               )}
               {product.sareeLength && (
                 <div>
                   <span className="text-muted-foreground">Length:</span>
-                  <span className="ml-2 font-medium">{product.sareeLength}</span>
+                  <span className="ml-2 font-medium text-foreground">{product.sareeLength}</span>
                 </div>
               )}
               {product.blousePiece !== undefined && (
                 <div>
                   <span className="text-muted-foreground">Blouse Piece:</span>
-                  <span className="ml-2 font-medium">{product.blousePiece ? 'Yes' : 'No'}</span>
+                  <span className="ml-2 font-medium text-foreground">{product.blousePiece ? 'Yes' : 'No'}</span>
                 </div>
               )}
             </div>
@@ -324,17 +319,17 @@ export default function ProductDetail() {
 
             <div className="flex flex-wrap gap-3 mb-8">
               <Button
-                className="flex-1 min-w-[140px]"
+                className="flex-1 min-w-[140px] rounded-full"
                 disabled={!product.inStock || addToCartMutation.isPending}
                 onClick={() => addToCartMutation.mutate({ productId: product._id, quantity })}
                 data-testid="button-add-to-cart"
               >
-                <ShoppingCart className="h-4 w-4 mr-2" />
+                <ShoppingBag className="h-4 w-4 mr-2" />
                 Add to Cart
               </Button>
               <Button
-                className="flex-1 min-w-[140px]"
-                variant="default"
+                className="flex-1 min-w-[140px] rounded-full bg-white dark:bg-card border-2 border-primary text-primary hover:bg-primary/10 dark:hover:bg-primary/10"
+                variant="outline"
                 disabled={!product.inStock || buyNowMutation.isPending}
                 onClick={handleBuyNow}
                 data-testid="button-buy-now"
@@ -345,6 +340,7 @@ export default function ProductDetail() {
               <Button
                 variant="outline"
                 size="icon"
+                className="rounded-full"
                 onClick={() => addToWishlistMutation.mutate(product._id)}
                 disabled={addToWishlistMutation.isPending}
                 data-testid="button-add-to-wishlist"
@@ -379,47 +375,122 @@ export default function ProductDetail() {
           </motion.div>
         </motion.div>
 
-        {product.specifications && (
-          <Card className="mb-8">
-            <CardHeader>
-              <h2 className="text-2xl font-bold">Product Specifications</h2>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {product.specifications.fabricComposition && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Fabric Composition</span>
-                    <span className="text-base font-medium">{product.specifications.fabricComposition}</span>
+        <div className="mb-8 max-w-4xl mx-auto">
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="description">
+              <AccordionTrigger 
+                className="text-lg font-bold text-[#6B4423] dark:text-[#D4A373] hover:no-underline"
+                data-testid="button-accordion-description"
+              >
+                PRODUCT DESCRIPTION
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                <p>{product.description || "Beautiful and elegant saree perfect for any occasion."}</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            {product.specifications && (
+              <AccordionItem value="specifications">
+                <AccordionTrigger 
+                  className="text-lg font-bold text-[#6B4423] dark:text-[#D4A373] hover:no-underline"
+                  data-testid="button-accordion-specification"
+                >
+                  PRODUCT SPECIFICATION
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    {product.specifications.fabricComposition && (
+                      <div>
+                        <span className="font-semibold text-foreground">Fabric Composition: </span>
+                        <span className="text-muted-foreground">{product.specifications.fabricComposition}</span>
+                      </div>
+                    )}
+                    {product.specifications.dimensions && (
+                      <div>
+                        <span className="font-semibold text-foreground">Dimensions: </span>
+                        <span className="text-muted-foreground">{product.specifications.dimensions}</span>
+                      </div>
+                    )}
+                    {product.specifications.weight && (
+                      <div>
+                        <span className="font-semibold text-foreground">Weight: </span>
+                        <span className="text-muted-foreground">{product.specifications.weight}</span>
+                      </div>
+                    )}
+                    {product.specifications.careInstructions && (
+                      <div className="md:col-span-2">
+                        <span className="font-semibold text-foreground">Care Instructions: </span>
+                        <span className="text-muted-foreground">{product.specifications.careInstructions}</span>
+                      </div>
+                    )}
+                    {product.specifications.countryOfOrigin && (
+                      <div>
+                        <span className="font-semibold text-foreground">Country of Origin: </span>
+                        <span className="text-muted-foreground">{product.specifications.countryOfOrigin}</span>
+                      </div>
+                    )}
                   </div>
-                )}
-                {product.specifications.dimensions && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Dimensions</span>
-                    <span className="text-base font-medium">{product.specifications.dimensions}</span>
-                  </div>
-                )}
-                {product.specifications.weight && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Weight</span>
-                    <span className="text-base font-medium">{product.specifications.weight}</span>
-                  </div>
-                )}
-                {product.specifications.careInstructions && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Care Instructions</span>
-                    <span className="text-base font-medium">{product.specifications.careInstructions}</span>
-                  </div>
-                )}
-                {product.specifications.countryOfOrigin && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Country of Origin</span>
-                    <span className="text-base font-medium">{product.specifications.countryOfOrigin}</span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                </AccordionContent>
+              </AccordionItem>
+            )}
+
+            <AccordionItem value="return">
+              <AccordionTrigger 
+                className="text-lg font-bold text-[#6B4423] dark:text-[#D4A373] hover:no-underline"
+                data-testid="button-accordion-return"
+              >
+                RETURN & EXCHANGE
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>Easy 7-day return and exchange policy.</p>
+                <p>Items must be unused and in original packaging with all tags attached.</p>
+                <p>Refunds will be processed within 5-7 business days.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="shipping">
+              <AccordionTrigger 
+                className="text-lg font-bold text-[#6B4423] dark:text-[#D4A373] hover:no-underline"
+                data-testid="button-accordion-shipping"
+              >
+                SHIPPING & DELIVERY
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>Free delivery on orders above ₹999.</p>
+                <p>Standard delivery takes 5-7 business days.</p>
+                <p>Express delivery available in select locations (2-3 business days).</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="manufacturer">
+              <AccordionTrigger 
+                className="text-lg font-bold text-[#6B4423] dark:text-[#D4A373] hover:no-underline"
+                data-testid="button-accordion-manufacturer"
+              >
+                MANUFACTURED BY
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                <p>Ramani Fashion</p>
+                <p>Quality assured traditional and contemporary sarees</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="care">
+              <AccordionTrigger 
+                className="text-lg font-bold text-[#6B4423] dark:text-[#D4A373] hover:no-underline"
+                data-testid="button-accordion-care"
+              >
+                CUSTOMER CARE
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>Contact us for any queries or support.</p>
+                <p>Email: support@ramanifashion.com</p>
+                <p>Phone: +91-XXXX-XXXXXX</p>
+                <p>Available: Monday to Saturday, 10 AM - 6 PM</p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
 
         {similarProducts && similarProducts.length > 0 && (
           <motion.div
