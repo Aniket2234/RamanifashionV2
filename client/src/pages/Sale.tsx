@@ -220,7 +220,7 @@ export default function Sale() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 py-8 pb-20 lg:pb-8">
+      <div className="max-w-7xl mx-auto px-4 lg:px-3 py-8 pb-20 lg:pb-8">
         <div className="mb-6">
           <nav className="text-sm text-muted-foreground mb-4" data-testid="breadcrumb">
             <a href="/" className="hover:text-foreground">Home</a>

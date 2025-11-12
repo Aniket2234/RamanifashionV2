@@ -308,7 +308,7 @@ export default function Home() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
         >
-          <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-7xl mx-auto px-4 lg:px-3">
             <motion.div 
               className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
               initial={{ opacity: 0, y: -20 }}
@@ -362,7 +362,7 @@ export default function Home() {
         </motion.section>
 
         <motion.section 
-          className="max-w-7xl mx-auto px-4 py-8"
+          className="max-w-7xl mx-auto px-4 lg:px-3 py-8"
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -385,7 +385,7 @@ export default function Home() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
         >
-          <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-7xl mx-auto px-4 lg:px-3">
             <motion.div 
               className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
               initial={{ opacity: 0, y: -20 }}
@@ -439,7 +439,7 @@ export default function Home() {
         </motion.section>
 
         <motion.section 
-          className="max-w-7xl mx-auto px-4 py-8"
+          className="max-w-7xl mx-auto px-4 lg:px-3 py-8"
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -461,7 +461,7 @@ export default function Home() {
           </div>
         </motion.section>
 
-        <section className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+        <section className="max-w-7xl mx-auto px-4 lg:px-3 py-8 md:py-12">
           <motion.div 
             className="text-center mb-8 md:mb-12"
             initial={{ opacity: 0, y: -20 }}
