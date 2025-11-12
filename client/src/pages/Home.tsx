@@ -249,13 +249,14 @@ export default function Home() {
           transition={{ duration: 0.6 }}
         >
           <div className="max-w-7xl mx-auto px-1 md:px-2">
-            <motion.div 
-              className="flex gap-3 md:gap-4 lg:gap-5 justify-between pb-4"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
+            <div className="overflow-x-auto scrollbar-hide md:overflow-visible">
+              <motion.div 
+                className="flex gap-3 md:gap-4 lg:gap-5 md:justify-between pb-4 px-2 md:px-0"
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
               {newCategories.filter(cat => cat.name !== "Sale").map((category, index) => (
                   <motion.div
                     key={category.name}
@@ -295,6 +296,7 @@ export default function Home() {
                   </motion.div>
                 ))}
               </motion.div>
+            </div>
           </div>
         </motion.section>
 
