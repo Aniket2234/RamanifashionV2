@@ -249,9 +249,9 @@ export default function Home() {
           transition={{ duration: 0.6 }}
         >
           <div className="max-w-7xl mx-auto px-4">
-            <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+            <div className="overflow-x-auto scrollbar-hide">
               <motion.div 
-                className="flex gap-6 md:gap-8 pb-4 justify-start"
+                className="flex gap-6 md:gap-8 pb-4 px-4"
                 variants={staggerContainer}
                 initial="hidden"
                 whileInView="visible"
