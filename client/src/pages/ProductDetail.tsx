@@ -22,10 +22,12 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [similarSort, setSimilarSort] = useState("rating-desc");
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setSelectedImage(0);
+    setSelectedColorIndex(0);
   }, [id]);
 
   const { data: product, isLoading } = useQuery({
@@ -133,13 +135,26 @@ export default function ProductDetail() {
     );
   }
 
-  const images = product.images && product.images.length > 0 
-    ? product.images 
-    : ["/api/placeholder/600/800"];
+  const colorVariants = product.colorVariants && product.colorVariants.length > 0
+    ? product.colorVariants
+    : null;
+
+  const currentColorVariant = colorVariants && colorVariants[selectedColorIndex];
+  
+  const images = currentColorVariant && currentColorVariant.images && currentColorVariant.images.length > 0
+    ? currentColorVariant.images
+    : (product.images && product.images.length > 0 
+      ? product.images 
+      : ["/api/placeholder/600/800"]);
 
   const discount = product.originalPrice 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
+
+  const handleColorChange = (index: number) => {
+    setSelectedColorIndex(index);
+    setSelectedImage(0);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -277,6 +292,40 @@ export default function ProductDetail() {
                 </Badge>
               )}
             </div>
+
+            {colorVariants && colorVariants.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold mb-3 text-foreground">Available Colors:</h3>
+                <div className="flex flex-wrap gap-3">
+                  {colorVariants.map((variant: any, index: number) => (
+                    <button
+                      key={index}
+                      onClick={() => handleColorChange(index)}
+                      className={`flex flex-col items-center gap-1 p-2 rounded-md border-2 transition-all ${
+                        selectedColorIndex === index 
+                          ? 'border-primary shadow-sm' 
+                          : 'border-border hover-elevate'
+                      }`}
+                      data-testid={`button-color-variant-${index}`}
+                    >
+                      <div className="w-16 h-20 rounded-md overflow-hidden bg-card">
+                        {variant.images && variant.images[0] && (
+                          <img 
+                            src={variant.images[0]} 
+                            alt={variant.color}
+                            className="w-full h-full object-cover"
+                            data-testid={`img-color-variant-${index}`}
+                          />
+                        )}
+                      </div>
+                      <span className="text-xs font-medium text-foreground" data-testid={`text-color-${index}`}>
+                        {variant.color}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-wrap gap-3 mb-8">
               <Button
