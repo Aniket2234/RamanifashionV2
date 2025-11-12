@@ -3,9 +3,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import ramaniLogo from "@/assets/ramani-logo.png";
 
 interface LoginDialogProps {
   open: boolean;
@@ -18,6 +20,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phoneDigits, setPhoneDigits] = useState<string[]>(Array(10).fill(""));
   const [otpDigits, setOtpDigits] = useState<string[]>(Array(4).fill(""));
+  const [notifyUpdates, setNotifyUpdates] = useState(false);
   const phoneInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -192,97 +195,164 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       onOpenChange(newOpen);
       if (!newOpen) resetForm();
     }}>
-      <DialogContent className="sm:max-w-md">
-        {step === "phone" ? (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-center">Enter Mobile Number</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 border-2 border-input rounded-lg px-3 py-2.5">
-                  <span className="text-lg">🇮🇳</span>
-                  <span className="font-semibold text-sm">+91</span>
-                  <div className="flex-1 flex gap-1">
-                    {phoneDigits.map((digit, index) => (
+      <DialogContent className="max-w-4xl p-0 gap-0 overflow-hidden">
+        <div className="grid lg:grid-cols-2 min-h-[500px]">
+          {/* Left Panel - Branding */}
+          <div className="hidden lg:flex flex-col items-center justify-center p-12 bg-gradient-to-br from-pink-50 to-pink-100">
+            <div className="max-w-sm space-y-6">
+              <img 
+                src={ramaniLogo} 
+                alt="Ramani Fashion" 
+                className="w-64 h-auto mx-auto"
+                data-testid="img-ramani-logo"
+              />
+              <div className="space-y-3 text-center">
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Welcome to Ramani Fashion
+                </h2>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Discover exquisite sarees and ethnic wear that blend tradition with contemporary elegance
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel - Form */}
+          <div className="flex flex-col p-8 lg:p-12 bg-white">
+            {step === "phone" ? (
+              <div className="flex-1 flex flex-col justify-center space-y-6">
+                <div className="space-y-2">
+                  <h1 className="text-2xl lg:text-3xl font-bold text-gray-900" data-testid="text-login-title">
+                    Enter Mobile Number
+                  </h1>
+                  <p className="text-sm text-gray-500">
+                    We'll send you a verification code
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 border-2 border-gray-200 rounded-lg px-4 py-3 focus-within:border-primary transition-colors">
+                    <span className="text-lg">🇮🇳</span>
+                    <span className="font-semibold text-sm text-gray-700">+91</span>
+                    <div className="flex-1 flex gap-1.5">
+                      {phoneDigits.map((digit, index) => (
+                        <input
+                          key={index}
+                          ref={(el) => (phoneInputRefs.current[index] = el)}
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => handlePhoneDigitChange(index, e.target.value)}
+                          onKeyDown={(e) => handlePhoneKeyDown(index, e)}
+                          className="w-7 h-9 text-center text-base font-semibold border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-primary transition-colors"
+                          data-testid={`input-phone-digit-${index}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="notify-updates"
+                      checked={notifyUpdates}
+                      onCheckedChange={(checked) => setNotifyUpdates(checked === true)}
+                      data-testid="checkbox-notify-updates"
+                    />
+                    <label
+                      htmlFor="notify-updates"
+                      className="text-sm text-gray-600 cursor-pointer"
+                    >
+                      Notify me for any updates & offers
+                    </label>
+                  </div>
+
+                  <Button
+                    onClick={handleSendOtp}
+                    disabled={phoneDigits.join("").length !== 10}
+                    className="w-full rounded-lg h-12 text-base font-semibold bg-pink-500 hover:bg-pink-600"
+                    data-testid="button-continue"
+                  >
+                    Continue
+                  </Button>
+
+                  <div className="space-y-2 text-center">
+                    <p className="text-xs text-gray-500">
+                      I accept that I have read & understood{" "}
+                      <a href="#" className="text-primary hover:underline" data-testid="link-privacy-policy">
+                        Privacy Policy
+                      </a>
+                      {" "}and{" "}
+                      <a href="#" className="text-primary hover:underline" data-testid="link-terms">
+                        T&Cs
+                      </a>
+                    </p>
+                    <a 
+                      href="#" 
+                      className="text-sm text-primary hover:underline block" 
+                      data-testid="link-trouble-login"
+                    >
+                      Trouble logging in?
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col justify-center space-y-6">
+                <div className="space-y-2">
+                  <h1 className="text-2xl lg:text-3xl font-bold text-gray-900" data-testid="text-otp-title">
+                    OTP Verification
+                  </h1>
+                  <p className="text-sm text-gray-500">
+                    We have sent verification code to
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-gray-900">+91 {phoneDigits.join("")}</span>
+                    <button
+                      onClick={handleEdit}
+                      className="text-primary text-sm hover:underline"
+                      data-testid="button-edit-phone"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-center gap-3">
+                    {otpDigits.map((digit, index) => (
                       <input
                         key={index}
-                        ref={(el) => (phoneInputRefs.current[index] = el)}
+                        ref={(el) => (otpInputRefs.current[index] = el)}
                         type="text"
                         inputMode="numeric"
                         maxLength={1}
                         value={digit}
-                        onChange={(e) => handlePhoneDigitChange(index, e.target.value)}
-                        onKeyDown={(e) => handlePhoneKeyDown(index, e)}
-                        className="w-7 h-8 text-center text-base font-semibold border-b-2 border-input bg-transparent focus:outline-none focus:border-primary"
+                        onChange={(e) => handleOtpDigitChange(index, e.target.value)}
+                        onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                        className="w-14 h-16 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                        data-testid={`input-otp-digit-${index}`}
                       />
                     ))}
                   </div>
+
+                  <Button
+                    onClick={handleVerifyOtp}
+                    disabled={otpDigits.join("").length !== 4 || loginMutation.isPending || registerMutation.isPending}
+                    className="w-full rounded-lg h-12 text-base font-semibold bg-pink-500 hover:bg-pink-600"
+                    data-testid="button-verify-otp"
+                  >
+                    {loginMutation.isPending || registerMutation.isPending ? "Verifying..." : "Verify"}
+                  </Button>
+
+                  <p className="text-xs text-center text-gray-500">
+                    Test OTP: <span className="font-semibold">{DUMMY_OTP}</span>
+                  </p>
                 </div>
-
-                <Button
-                  onClick={handleSendOtp}
-                  disabled={phoneDigits.join("").length !== 10}
-                  className="w-full rounded-full h-11 text-base font-semibold"
-                >
-                  Continue
-                </Button>
-
-                <p className="text-xs text-muted-foreground text-center">
-                  By continuing, you agree to our Terms & Conditions
-                </p>
               </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-center">OTP Verification</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <p className="text-center text-sm text-muted-foreground">
-                We have sent verification code to
-              </p>
-              <div className="text-center">
-                <span className="font-semibold">+91 {phoneDigits.join("")}</span>
-                <button
-                  onClick={handleEdit}
-                  className="ml-2 text-primary h-auto p-0 text-sm underline hover:no-underline bg-transparent border-0 cursor-pointer"
-                >
-                  Edit
-                </button>
-              </div>
-
-              <div className="flex justify-center gap-3 py-4">
-                {otpDigits.map((digit, index) => (
-                  <input
-                    key={index}
-                    ref={(el) => (otpInputRefs.current[index] = el)}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleOtpDigitChange(index, e.target.value)}
-                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                    className="w-14 h-16 text-center text-2xl font-bold border-2 border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
-                  />
-                ))}
-              </div>
-
-              <Button
-                onClick={handleVerifyOtp}
-                disabled={otpDigits.join("").length !== 4 || loginMutation.isPending || registerMutation.isPending}
-                className="w-full rounded-full h-11 text-base font-semibold"
-              >
-                Verify
-              </Button>
-
-              <p className="text-xs text-center text-muted-foreground">
-                Test OTP: {DUMMY_OTP}
-              </p>
-            </div>
-          </>
-        )}
+            )}
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
