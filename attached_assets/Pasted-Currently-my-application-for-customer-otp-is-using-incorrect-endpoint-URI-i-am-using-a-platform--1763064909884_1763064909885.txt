@@ -1,0 +1,138 @@
+Currently my application for customer otp is using incorrect endpoint URI.
+
+i am using a platform called https://superfast.akst.in/
+
+WHATSAPP_API_KEY = 7RlFwj57xE6wHngTfSmNHA
+WHATSAPP_PHONE_NUMBER_ID = 919970127778
+
+WhatsApp OTP Endpoint URI & Implementation
+1. Base API Endpoint
+https://cloudapi.akst.in/api/v1.0/messages/send-template/{PHONE_NUMBER_ID}
+
+2. Required Credentials
+WHATSAPP_API_KEY - Your authorization token (Bearer token)
+WHATSAPP_PHONE_NUMBER_ID - Your WhatsApp channel number (e.g., 919970127778)
+3. HTTP Request Details
+Method: POST
+
+Headers:
+
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer YOUR_WHATSAPP_API_KEY"
+}
+
+Request Body:
+
+{
+  "messaging_product": "whatsapp",
+  "recipient_type": "individual",
+  "to": "919876543210",
+  "type": "template",
+  "template": {
+    "name": "otptest",
+    "language": {
+      "code": "en"
+    },
+    "components": [
+      {
+        "type": "body",
+        "parameters": [
+          {
+            "type": "text",
+            "text": "123456"
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "sub_type": "url",
+        "index": "0",
+        "parameters": [
+          {
+            "type": "text",
+            "text": "123456"
+          }
+        ]
+      }
+    ]
+  }
+}
+
+4. Phone Number Format
+The phone number must be in 12-digit format starting with country code:
+
+Input: 9876543210 → Output: 919876543210
+Input: +919876543210 → Output: 919876543210
+Input: 09876543210 → Output: 919876543210
+5. Application Endpoints (Backend Routes)
+In your application, you'll typically have these routes:
+
+Send OTP:
+
+POST /api/auth/send-otp
+Body: { "mobileNumber": "9876543210" }
+
+Verify OTP:
+
+POST /api/auth/verify-otp
+Body: { "mobileNumber": "9876543210", "otp": "123456" }
+
+Forgot Password (with OTP):
+
+POST /api/auth/forgot-password
+Body: { "mobileNumber": "9876543210", "role": "User" }
+
+6. Important Notes
+Template Name: The template name "otptest" must be pre-configured in your WhatsApp Business API account
+Template Structure: Make sure your template has:
+Body component with 1 parameter (for OTP in message)
+Button component with URL sub_type and 1 parameter (for OTP in button)
+Phone Number: Always format to 12 digits with country code (91 for India)
+Error Handling: Implement retry logic with exponential backoff for reliability
+7. Complete Code Example
+Here's a minimal implementation:
+
+const WHATSAPP_BASE_URL = 'https://cloudapi.akst.in/api/v1.0/messages';
+const WHATSAPP_API_KEY = 'YOUR_API_KEY';
+const WHATSAPP_PHONE_NUMBER_ID = 'YOUR_PHONE_NUMBER_ID';
+async function sendWhatsAppOTP(to: string, otp: string) {
+  const url = `${WHATSAPP_BASE_URL}/send-template/${WHATSAPP_PHONE_NUMBER_ID}`;
+  
+  const payload = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: formatPhoneNumber(to), // Must be 12 digits: 919876543210
+    type: 'template',
+    template: {
+      name: 'otptest',
+      language: { code: 'en' },
+      components: [
+        {
+          type: 'body',
+          parameters: [{ type: 'text', text: otp }]
+        },
+        {
+          type: 'button',
+          sub_type: 'url',
+          index: '0',
+          parameters: [{ type: 'text', text: otp }]
+        }
+      ]
+    }
+  };
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${WHATSAPP_API_KEY}`
+    },
+    body: JSON.stringify(payload)
+  });
+  return await response.json();
+}
+
+That's everything you need to implement the same OTP feature
+
+also test it by sending it to 7507219775(already a registered customer) in customer login to see if it is working and keep trying till it does work.
+
