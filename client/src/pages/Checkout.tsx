@@ -61,6 +61,7 @@ export default function Checkout() {
   const createOrderMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/orders", "POST", data),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
       toast({ title: "Order placed successfully!" });
       setLocation("/orders");
     },
