@@ -10,6 +10,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**November 13, 2025 - Customer OTP Login Flow Enhancement:**
+- **Centralized Authentication System:** Created auth utility (`client/src/lib/auth.ts`) to manage JWT tokens and customer data
+- **Event-Based Auth State:** Implemented custom event system to notify components when authentication state changes
+- **Automatic Profile Redirect:** After successful OTP verification, customers are now automatically redirected to profile page
+- **Smart Login Detection:** Profile/customer button now checks authentication status before showing login dialog
+- **Customer Profile Creation:** New customers with only phone number can add optional details (name, email, DOB, address) in profile page
+- **Persistent Login:** Customers remain logged in across sessions using JWT token stored in localStorage
+- **Updated Files:** client/src/lib/auth.ts (new), client/src/components/LoginDialog.tsx, client/src/components/Header.tsx, client/src/pages/Profile.tsx
+- **Impact:**
+  - After entering correct OTP, customer profile is created/updated in MongoDB
+  - Customer is logged in and redirected to profile page to complete optional details
+  - Clicking profile button when already authenticated goes directly to profile
+  - Authentication state updates across all components in real-time via event system
+- **Architecture:** Auth utility provides single source of truth for authentication state; components subscribe to auth changes for reactive updates
+
 **November 12, 2025 - Color Variant Image Display in Product Grids:**
 - **Fixed Image Display Logic:** Updated all product grid views to prioritize images from `colorVariants[0].images` before falling back to legacy `images` array
 - **Consistent Fallback Behavior:** Applied image resolution pattern: `product.colorVariants?.[0]?.images?.[0] || product.images?.[0] || "/placeholder.jpg"`
