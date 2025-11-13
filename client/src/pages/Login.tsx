@@ -37,7 +37,10 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       await migrateGuestDataToServer();
-      toast({ title: "Login successful!" });
+      toast({ 
+        title: "Welcome back!", 
+        description: `Good to see you again, ${data.user.name || 'there'}!`
+      });
       setLocation("/");
     },
     onError: (error: any) => {
@@ -64,7 +67,10 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       await migrateGuestDataToServer();
-      toast({ title: "Registration successful!" });
+      toast({ 
+        title: "Your account has been created!", 
+        description: `Welcome to our store, ${data.user.name}!`
+      });
       setLocation("/");
     },
     onError: (error: any) => {
